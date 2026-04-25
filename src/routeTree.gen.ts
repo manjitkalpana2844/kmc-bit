@@ -9,38 +9,161 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SemesterSemRouteImport } from './routes/semester.$sem'
+import { Route as PdfPdfIdRouteImport } from './routes/pdf.$pdfId'
+import { Route as SubjectSemSubjectRouteImport } from './routes/subject.$sem.$subject'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SemesterSemRoute = SemesterSemRouteImport.update({
+  id: '/semester/$sem',
+  path: '/semester/$sem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PdfPdfIdRoute = PdfPdfIdRouteImport.update({
+  id: '/pdf/$pdfId',
+  path: '/pdf/$pdfId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SubjectSemSubjectRoute = SubjectSemSubjectRouteImport.update({
+  id: '/subject/$sem/$subject',
+  path: '/subject/$sem/$subject',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/pdf/$pdfId': typeof PdfPdfIdRoute
+  '/semester/$sem': typeof SemesterSemRoute
+  '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/pdf/$pdfId': typeof PdfPdfIdRoute
+  '/semester/$sem': typeof SemesterSemRoute
+  '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/pdf/$pdfId': typeof PdfPdfIdRoute
+  '/semester/$sem': typeof SemesterSemRoute
+  '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/admin-login'
+    | '/login'
+    | '/reset-password'
+    | '/pdf/$pdfId'
+    | '/semester/$sem'
+    | '/subject/$sem/$subject'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/admin-login'
+    | '/login'
+    | '/reset-password'
+    | '/pdf/$pdfId'
+    | '/semester/$sem'
+    | '/subject/$sem/$subject'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/admin-login'
+    | '/login'
+    | '/reset-password'
+    | '/pdf/$pdfId'
+    | '/semester/$sem'
+    | '/subject/$sem/$subject'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  PdfPdfIdRoute: typeof PdfPdfIdRoute
+  SemesterSemRoute: typeof SemesterSemRoute
+  SubjectSemSubjectRoute: typeof SubjectSemSubjectRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,21 +171,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/semester/$sem': {
+      id: '/semester/$sem'
+      path: '/semester/$sem'
+      fullPath: '/semester/$sem'
+      preLoaderRoute: typeof SemesterSemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pdf/$pdfId': {
+      id: '/pdf/$pdfId'
+      path: '/pdf/$pdfId'
+      fullPath: '/pdf/$pdfId'
+      preLoaderRoute: typeof PdfPdfIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subject/$sem/$subject': {
+      id: '/subject/$sem/$subject'
+      path: '/subject/$sem/$subject'
+      fullPath: '/subject/$sem/$subject'
+      preLoaderRoute: typeof SubjectSemSubjectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  PdfPdfIdRoute: PdfPdfIdRoute,
+  SemesterSemRoute: SemesterSemRoute,
+  SubjectSemSubjectRoute: SubjectSemSubjectRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
