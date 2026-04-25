@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SemesterSemRouteImport } from './routes/semester.$sem'
+import { Route as PdfPdfIdRouteImport } from './routes/pdf.$pdfId'
 import { Route as SubjectSemSubjectRouteImport } from './routes/subject.$sem.$subject'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -41,6 +42,11 @@ const SemesterSemRoute = SemesterSemRouteImport.update({
   path: '/semester/$sem',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PdfPdfIdRoute = PdfPdfIdRouteImport.update({
+  id: '/pdf/$pdfId',
+  path: '/pdf/$pdfId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubjectSemSubjectRoute = SubjectSemSubjectRouteImport.update({
   id: '/subject/$sem/$subject',
   path: '/subject/$sem/$subject',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/admin-login': typeof AdminLoginRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/admin-login': typeof AdminLoginRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/admin-login': typeof AdminLoginRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/login'
     | '/reset-password'
+    | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/subject/$sem/$subject'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/login'
     | '/reset-password'
+    | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/subject/$sem/$subject'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/login'
     | '/reset-password'
+    | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/subject/$sem/$subject'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  PdfPdfIdRoute: typeof PdfPdfIdRoute
   SemesterSemRoute: typeof SemesterSemRoute
   SubjectSemSubjectRoute: typeof SubjectSemSubjectRoute
 }
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SemesterSemRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pdf/$pdfId': {
+      id: '/pdf/$pdfId'
+      path: '/pdf/$pdfId'
+      fullPath: '/pdf/$pdfId'
+      preLoaderRoute: typeof PdfPdfIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/subject/$sem/$subject': {
       id: '/subject/$sem/$subject'
       path: '/subject/$sem/$subject'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  PdfPdfIdRoute: PdfPdfIdRoute,
   SemesterSemRoute: SemesterSemRoute,
   SubjectSemSubjectRoute: SubjectSemSubjectRoute,
 }
