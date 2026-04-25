@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SemesterSemRouteImport } from './routes/semester.$sem'
+import { Route as SubjectSemSubjectRouteImport } from './routes/subject.$sem.$subject'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -40,6 +41,11 @@ const SemesterSemRoute = SemesterSemRouteImport.update({
   path: '/semester/$sem',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SubjectSemSubjectRoute = SubjectSemSubjectRouteImport.update({
+  id: '/subject/$sem/$subject',
+  path: '/subject/$sem/$subject',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/semester/$sem': typeof SemesterSemRoute
+  '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/semester/$sem': typeof SemesterSemRoute
+  '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,6 +70,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/semester/$sem': typeof SemesterSemRoute
+  '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,8 +80,15 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/semester/$sem'
+    | '/subject/$sem/$subject'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin-login' | '/login' | '/reset-password' | '/semester/$sem'
+  to:
+    | '/'
+    | '/admin-login'
+    | '/login'
+    | '/reset-password'
+    | '/semester/$sem'
+    | '/subject/$sem/$subject'
   id:
     | '__root__'
     | '/'
@@ -80,6 +96,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/semester/$sem'
+    | '/subject/$sem/$subject'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +105,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SemesterSemRoute: typeof SemesterSemRoute
+  SubjectSemSubjectRoute: typeof SubjectSemSubjectRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -127,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SemesterSemRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/subject/$sem/$subject': {
+      id: '/subject/$sem/$subject'
+      path: '/subject/$sem/$subject'
+      fullPath: '/subject/$sem/$subject'
+      preLoaderRoute: typeof SubjectSemSubjectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -136,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SemesterSemRoute: SemesterSemRoute,
+  SubjectSemSubjectRoute: SubjectSemSubjectRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
