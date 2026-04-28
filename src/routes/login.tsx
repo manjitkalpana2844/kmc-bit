@@ -158,10 +158,6 @@ function LoginPage() {
             </Button>
           </div>
         </Card>
-
-        <p className="text-center text-[11px] text-muted-foreground mt-6">
-          Tip: long-press the logo for admin access
-        </p>
       </div>
     </div>
   );
