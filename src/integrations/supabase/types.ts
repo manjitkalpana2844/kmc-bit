@@ -162,6 +162,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_access: {
+        Row: {
+          access_type: Database["public"]["Enums"]["access_type"]
+          created_at: string
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          semester: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_type: Database["public"]["Enums"]["access_type"]
+          created_at?: string
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          semester?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_type?: Database["public"]["Enums"]["access_type"]
+          created_at?: string
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          semester?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -195,8 +237,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      user_can_access_semester: {
+        Args: { _semester: number; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
+      access_type: "semester_pass" | "monthly_all_access"
       app_role: "admin" | "student"
       exam_type:
         | "first_term"
@@ -332,6 +379,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      access_type: ["semester_pass", "monthly_all_access"],
       app_role: ["admin", "student"],
       exam_type: [
         "first_term",
