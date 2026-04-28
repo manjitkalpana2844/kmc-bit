@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SemesterSemRouteImport } from './routes/semester.$sem'
 import { Route as PdfPdfIdRouteImport } from './routes/pdf.$pdfId'
 import { Route as SubjectSemSubjectRouteImport } from './routes/subject.$sem.$subject'
+import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api/public/bootstrap-admin'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -58,6 +59,11 @@ const SubjectSemSubjectRoute = SubjectSemSubjectRouteImport.update({
   path: '/subject/$sem/$subject',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBootstrapAdminRoute = ApiPublicBootstrapAdminRouteImport.update({
+  id: '/api/public/bootstrap-admin',
+  path: '/api/public/bootstrap-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
+  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
+  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
+  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/subject/$sem/$subject': typeof SubjectSemSubjectRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/pdf/$pdfId'
     | '/semester/$sem'
+    | '/api/public/bootstrap-admin'
     | '/subject/$sem/$subject'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/pdf/$pdfId'
     | '/semester/$sem'
+    | '/api/public/bootstrap-admin'
     | '/subject/$sem/$subject'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/pdf/$pdfId'
     | '/semester/$sem'
+    | '/api/public/bootstrap-admin'
     | '/subject/$sem/$subject'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   PdfPdfIdRoute: typeof PdfPdfIdRoute
   SemesterSemRoute: typeof SemesterSemRoute
+  ApiPublicBootstrapAdminRoute: typeof ApiPublicBootstrapAdminRoute
   SubjectSemSubjectRoute: typeof SubjectSemSubjectRoute
 }
 
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubjectSemSubjectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/bootstrap-admin': {
+      id: '/api/public/bootstrap-admin'
+      path: '/api/public/bootstrap-admin'
+      fullPath: '/api/public/bootstrap-admin'
+      preLoaderRoute: typeof ApiPublicBootstrapAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   PdfPdfIdRoute: PdfPdfIdRoute,
   SemesterSemRoute: SemesterSemRoute,
+  ApiPublicBootstrapAdminRoute: ApiPublicBootstrapAdminRoute,
   SubjectSemSubjectRoute: SubjectSemSubjectRoute,
 }
 export const routeTree = rootRouteImport
