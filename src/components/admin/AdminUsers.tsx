@@ -167,8 +167,8 @@ function AccessDialog({ user, access, onChange }: { user: UserRow; access: Acces
           <Select value={type} onValueChange={(v) => setType(v as any)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="semester_pass">Semester Pass (Rs 999)</SelectItem>
-              <SelectItem value="monthly_all_access">Monthly All Access (Rs 399)</SelectItem>
+              <SelectItem value="semester_pass">Semester Pass (Rs 599)</SelectItem>
+              <SelectItem value="monthly_all_access">Monthly All Access (Rs 199 / month)</SelectItem>
             </SelectContent>
           </Select>
           {type === "semester_pass" && (

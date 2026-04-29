@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Lock, Search, BookOpen } from "lucide-react";
+import { Lock, Search, BookOpen, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
 
 export const Route = createFileRoute("/")({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, hasActiveAccess } = useAuth();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [locked, setLocked] = useState<Record<number, boolean>>({});
@@ -81,6 +82,18 @@ function Index() {
           <BookOpen className="h-5 w-5" />
           Semesters
         </h2>
+        {!hasActiveAccess && (
+          <Card className="p-4 mb-4 flex flex-wrap items-center gap-3" style={{ background: "var(--gradient-primary)" }}>
+            <Crown className="h-5 w-5 text-primary-foreground" />
+            <div className="flex-1 min-w-0 text-primary-foreground">
+              <div className="font-semibold text-sm">Unlock all PDFs</div>
+              <div className="text-xs opacity-90">Semester Pass Rs 599 · Monthly All Access Rs 199</div>
+            </div>
+            <Button asChild variant="secondary" size="sm">
+              <Link to="/get-access">Get Access</Link>
+            </Button>
+          </Card>
+        )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map((sem) => {
