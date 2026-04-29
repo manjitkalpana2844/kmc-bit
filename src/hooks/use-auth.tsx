@@ -75,6 +75,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Live-sync access changes (admin lock/unlock/grant) to the user's session
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`user_access:${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "user_access", filter: `user_id=eq.${user.id}` },
+        () => loadUserData(user.id),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setProfile(null);
