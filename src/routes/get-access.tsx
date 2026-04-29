@@ -47,7 +47,7 @@ function GetAccessPage() {
       supabase.from("app_settings").select("value").eq("key", "payment").maybeSingle(),
       supabase.from("payment_requests").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
     ]);
-    if (s?.value) setSettings(s.value as PaymentSettings);
+    if (s?.value) setSettings(s.value as unknown as PaymentSettings);
     setRequests(r ?? []);
   };
 
