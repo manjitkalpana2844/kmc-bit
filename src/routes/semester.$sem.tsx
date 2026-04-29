@@ -25,12 +25,20 @@ function SemesterPage() {
   }, [loading, user, navigate]);
 
   useEffect(() => {
-    supabase
-      .from("semester_status")
-      .select("is_locked")
-      .eq("semester", semNum)
-      .maybeSingle()
-      .then(({ data }) => setLocked(data?.is_locked ?? true));
+    const load = async () => {
+      const { data } = await supabase
+        .from("semester_status")
+        .select("is_locked")
+        .eq("semester", semNum)
+        .maybeSingle();
+      setLocked(data?.is_locked ?? true);
+    };
+    load();
+    const ch = supabase
+      .channel(`semester_status:${semNum}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "semester_status", filter: `semester=eq.${semNum}` }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, [semNum]);
 
   const subjects = SEMESTER_SUBJECTS[semNum] ?? [];

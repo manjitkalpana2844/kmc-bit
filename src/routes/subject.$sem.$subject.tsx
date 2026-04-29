@@ -42,18 +42,38 @@ function SubjectPage() {
   }, [loading, user, navigate]);
 
   useEffect(() => {
-    supabase.from("semester_status").select("is_locked").eq("semester", semNum).maybeSingle()
-      .then(({ data }) => setLocked(data?.is_locked ?? true));
+    const load = async () => {
+      const { data } = await supabase
+        .from("semester_status")
+        .select("is_locked")
+        .eq("semester", semNum)
+        .maybeSingle();
+      setLocked(data?.is_locked ?? true);
+    };
+    load();
+    const ch = supabase
+      .channel(`sem_status_subj:${semNum}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "semester_status", filter: `semester=eq.${semNum}` }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, [semNum]);
 
   useEffect(() => {
-    supabase
-      .from("pdf_files")
-      .select("*")
-      .eq("semester", semNum)
-      .eq("subject", subjectName)
-      .order("year", { ascending: false })
-      .then(({ data }) => setPdfs((data as PdfRow[]) ?? []));
+    const load = async () => {
+      const { data } = await supabase
+        .from("pdf_files")
+        .select("*")
+        .eq("semester", semNum)
+        .eq("subject", subjectName)
+        .order("year", { ascending: false });
+      setPdfs((data as PdfRow[]) ?? []);
+    };
+    load();
+    const ch = supabase
+      .channel(`pdf_files:${semNum}:${subjectName}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pdf_files", filter: `semester=eq.${semNum}` }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, [semNum, subjectName]);
 
   const filtered = useMemo(() => {

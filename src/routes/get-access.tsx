@@ -65,6 +65,17 @@ function GetAccessPage() {
     return () => { supabase.removeChannel(ch); };
   }, [user?.id]);
 
+  // Live payment settings (price / account info) for everyone
+  useEffect(() => {
+    const ch = supabase
+      .channel("app_settings:payment")
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "app_settings", filter: "key=eq.payment" },
+        () => loadAll())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
   const submit = async () => {
     if (!user || !file || !settings) return;
     if (file.size > 5 * 1024 * 1024) return toast.error("File must be under 5MB");
