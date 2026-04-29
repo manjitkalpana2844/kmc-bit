@@ -16,9 +16,11 @@ interface AuthContextValue {
   profile: Profile | null;
   isAdmin: boolean;
   hasActiveAccess: boolean;
+  accessExpiresAt: string | null;
   loading: boolean;
   signOut: () => Promise<void>;
   refreshRole: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -29,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [hasActiveAccess, setHasActiveAccess] = useState(false);
+  const [accessExpiresAt, setAccessExpiresAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadUserData = async (uid: string) => {
@@ -44,12 +47,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(prof as Profile | null);
     setIsAdmin((roles ?? []).some((r: { role: string }) => r.role === "admin"));
     const now = Date.now();
-    setHasActiveAccess(
-      (access ?? []).some(
-        (a: { is_active: boolean; expires_at: string | null }) =>
-          a.is_active && (!a.expires_at || new Date(a.expires_at).getTime() > now),
-      ),
+    const activeRows = (access ?? []).filter(
+      (a: { is_active: boolean; expires_at: string | null }) =>
+        a.is_active && (!a.expires_at || new Date(a.expires_at).getTime() > now),
     );
+    setHasActiveAccess(activeRows.length > 0);
+    // Earliest upcoming expiry among active rows (null = lifetime)
+    const expiries = activeRows
+      .map((a: any) => a.expires_at)
+      .filter((e: string | null): e is string => !!e)
+      .sort();
+    setAccessExpiresAt(activeRows.some((a: any) => !a.expires_at) ? null : expiries[0] ?? null);
   };
 
   useEffect(() => {
@@ -62,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
         setIsAdmin(false);
         setHasActiveAccess(false);
+        setAccessExpiresAt(null);
       }
     });
 
@@ -96,14 +105,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
     setIsAdmin(false);
     setHasActiveAccess(false);
+    setAccessExpiresAt(null);
   };
 
   const refreshRole = async () => {
     if (user) await loadUserData(user.id);
   };
 
+  const refreshProfile = async () => {
+    if (user) await loadUserData(user.id);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, profile, isAdmin, hasActiveAccess, loading, signOut, refreshRole }}>
+    <AuthContext.Provider value={{ user, session, profile, isAdmin, hasActiveAccess, accessExpiresAt, loading, signOut, refreshRole, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
