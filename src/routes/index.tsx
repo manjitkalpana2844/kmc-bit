@@ -25,13 +25,20 @@ function Index() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("semester_status").select("*").then(({ data }) => {
+    const load = async () => {
+      const { data } = await supabase.from("semester_status").select("*");
       const m: Record<number, boolean> = {};
       (data ?? []).forEach((r: { semester: number; is_locked: boolean }) => {
         m[r.semester] = r.is_locked;
       });
       setLocked(m);
-    });
+    };
+    load();
+    const ch = supabase
+      .channel("semester_status:all")
+      .on("postgres_changes", { event: "*", schema: "public", table: "semester_status" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, [user]);
 
   const filtered = useMemo(() => {
