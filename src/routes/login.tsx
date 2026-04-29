@@ -87,12 +87,6 @@ function LoginPage() {
             <h1 className="text-2xl font-bold">BIT KMC Question Bank</h1>
             <p className="text-xs text-muted-foreground mt-1">Kailali Multiple Campus · BIT Program</p>
           </div>
-          <p className="text-[11px] text-muted-foreground text-center">
-            Tip: press &amp; hold the logo for{" "}
-            <Link to="/admin-login" className="text-primary hover:underline">
-              admin login
-            </Link>
-          </p>
         </div>
 
         <Card className="p-6" style={{ boxShadow: "var(--shadow-elegant)" }}>
