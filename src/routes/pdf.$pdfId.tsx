@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { examTypeLabel, SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { trackPdfView, logDownload } from "@/lib/tracking";
 import { BookmarkButton } from "@/components/BookmarkButton";
+import { OfflineButton } from "@/components/OfflineButton";
 import { PdfRating } from "@/components/PdfRating";
 import { PdfComments } from "@/components/PdfComments";
 import { PdfNotes } from "@/components/PdfNotes";
@@ -158,6 +159,14 @@ function PdfPage() {
               <ZoomIn className="h-4 w-4" />
             </Button>
             {pdf && <BookmarkButton pdfId={pdf.id} />}
+            {pdf && (
+              <OfflineButton
+                pdfId={pdf.id}
+                title={pdf.title}
+                signedUrl={signedUrl}
+                meta={{ subject: pdf.subject, semester: pdf.semester, year: pdf.year, exam_type: pdf.exam_type }}
+              />
+            )}
             <Button variant="outline" size="sm" onClick={share}>
               <Share2 className="h-4 w-4 mr-1" />Share
             </Button>
