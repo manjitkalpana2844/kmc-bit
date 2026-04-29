@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Lock, Search, BookOpen, Crown } from "lucide-react";
+import { Lock, Search, BookOpen, Crown, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
+import { daysLeft } from "@/lib/tracking";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const { user, profile, loading, hasActiveAccess } = useAuth();
+  const { user, profile, loading, hasActiveAccess, accessExpiresAt } = useAuth();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [locked, setLocked] = useState<Record<number, boolean>>({});
@@ -101,6 +102,22 @@ function Index() {
             </Button>
           </Card>
         )}
+        {hasActiveAccess && accessExpiresAt && (() => {
+          const left = daysLeft(accessExpiresAt);
+          if (left === null || left > 7) return null;
+          return (
+            <Card className="p-4 mb-4 flex flex-wrap items-center gap-3 border-destructive/40">
+              <Clock className="h-5 w-5 text-destructive" />
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-sm">
+                  {left === 0 ? "Access expires today" : `Access expires in ${left} day${left === 1 ? "" : "s"}`}
+                </div>
+                <div className="text-xs text-muted-foreground">Renew now to keep your access uninterrupted.</div>
+              </div>
+              <Button asChild size="sm"><Link to="/get-access">Renew</Link></Button>
+            </Card>
+          );
+        })()}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map((sem) => {

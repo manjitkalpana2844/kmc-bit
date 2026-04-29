@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as GetAccessRouteImport } from './routes/get-access'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -25,14 +28,29 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GetAccessRoute = GetAccessRouteImport.update({
   id: '/get-access',
   path: '/get-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -75,8 +93,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
@@ -87,8 +108,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
@@ -100,8 +124,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
@@ -114,8 +141,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/feedback'
     | '/get-access'
+    | '/library'
     | '/login'
+    | '/profile'
     | '/reset-password'
     | '/pdf/$pdfId'
     | '/semester/$sem'
@@ -126,8 +156,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/feedback'
     | '/get-access'
+    | '/library'
     | '/login'
+    | '/profile'
     | '/reset-password'
     | '/pdf/$pdfId'
     | '/semester/$sem'
@@ -138,8 +171,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/feedback'
     | '/get-access'
+    | '/library'
     | '/login'
+    | '/profile'
     | '/reset-password'
     | '/pdf/$pdfId'
     | '/semester/$sem'
@@ -151,8 +187,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  FeedbackRoute: typeof FeedbackRoute
   GetAccessRoute: typeof GetAccessRoute
+  LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   PdfPdfIdRoute: typeof PdfPdfIdRoute
   SemesterSemRoute: typeof SemesterSemRoute
@@ -169,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -176,11 +222,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/get-access': {
       id: '/get-access'
       path: '/get-access'
       fullPath: '/get-access'
       preLoaderRoute: typeof GetAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-login': {
@@ -239,8 +299,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AdminLoginRoute: AdminLoginRoute,
+  FeedbackRoute: FeedbackRoute,
   GetAccessRoute: GetAccessRoute,
+  LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   PdfPdfIdRoute: PdfPdfIdRoute,
   SemesterSemRoute: SemesterSemRoute,
