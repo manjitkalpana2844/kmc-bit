@@ -10,9 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { BadgeCheck, Crown, Check, Clock, X, Upload } from "lucide-react";
+import { BadgeCheck, Crown, Check, Clock, X, Upload, Download } from "lucide-react";
 import { toast } from "sonner";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
+import { downloadReceiptPdf } from "@/lib/receipt";
 
 export const Route = createFileRoute("/get-access")({ component: GetAccessPage });
 
@@ -26,7 +27,7 @@ interface PaymentSettings {
 }
 
 function GetAccessPage() {
-  const { user, loading, hasActiveAccess } = useAuth();
+  const { user, loading, hasActiveAccess, profile } = useAuth();
   const navigate = useNavigate();
   const [settings, setSettings] = useState<PaymentSettings | null>(null);
   const [plan, setPlan] = useState<"semester_pass" | "monthly_all_access">("semester_pass");
@@ -185,6 +186,21 @@ function GetAccessPage() {
                     <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div>
                     {r.review_note && <div className="text-xs text-muted-foreground mt-1">Note: {r.review_note}</div>}
                   </div>
+                  {r.status === "approved" && (
+                    <Button variant="outline" size="sm" onClick={() => downloadReceiptPdf({
+                      requestId: r.id,
+                      userName: profile?.name ?? "Student",
+                      userEmail: profile?.email ?? user?.email ?? "",
+                      plan: r.plan,
+                      semester: r.semester,
+                      amount: r.amount,
+                      transactionId: r.transaction_id,
+                      approvedAt: r.reviewed_at ?? r.updated_at ?? r.created_at,
+                      expiresAt: null,
+                    })}>
+                      <Download className="h-4 w-4 mr-1" />Receipt
+                    </Button>
+                  )}
                   <StatusBadge status={r.status} />
                 </div>
               ))}

@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Receipt, Check, X, Eye, Save } from "lucide-react";
+import { Receipt, Check, X, Eye, Save, Download } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
+import { downloadReceiptPdf } from "@/lib/receipt";
 
 export function AdminPaymentRequests() {
   const { user: me } = useAuth();
@@ -34,20 +35,33 @@ export function AdminPaymentRequests() {
 
   const approve = async (req: any) => {
     if (!me) return;
-    const { error: aErr } = await supabase.from("user_access").insert({
+    const { data: accessRow, error: aErr } = await supabase.from("user_access").insert({
       user_id: req.user_id,
       access_type: req.plan,
       semester: req.plan === "semester_pass" ? req.semester : null,
       is_active: true,
       granted_by: me.id,
       notes: `Auto-granted from payment request ${req.id}`,
-    });
+    }).select("expires_at").maybeSingle();
     if (aErr) return toast.error(aErr.message);
+    const approvedAt = new Date().toISOString();
     const { error } = await supabase.from("payment_requests").update({
       status: "approved", reviewed_by: me.id, reviewed_at: new Date().toISOString(),
     }).eq("id", req.id);
     if (error) return toast.error(error.message);
     toast.success("Approved & access granted");
+    const p = profiles[req.user_id];
+    downloadReceiptPdf({
+      requestId: req.id,
+      userName: p?.name ?? "Student",
+      userEmail: p?.email ?? "",
+      plan: req.plan,
+      semester: req.semester,
+      amount: req.amount,
+      transactionId: req.transaction_id,
+      approvedAt,
+      expiresAt: accessRow?.expires_at ?? null,
+    });
     load();
   };
 
@@ -113,6 +127,21 @@ export function AdminPaymentRequests() {
                       <Button size="sm" onClick={() => approve(r)}><Check className="h-4 w-4 mr-1" />Approve</Button>
                       <Button variant="destructive" size="sm" onClick={() => reject(r)}><X className="h-4 w-4 mr-1" />Reject</Button>
                     </>
+                  )}
+                  {k === "approved" && (
+                    <Button variant="outline" size="sm" onClick={() => downloadReceiptPdf({
+                      requestId: r.id,
+                      userName: p?.name ?? "Student",
+                      userEmail: p?.email ?? "",
+                      plan: r.plan,
+                      semester: r.semester,
+                      amount: r.amount,
+                      transactionId: r.transaction_id,
+                      approvedAt: r.reviewed_at ?? r.updated_at ?? r.created_at,
+                      expiresAt: null,
+                    })}>
+                      <Download className="h-4 w-4 mr-1" />Receipt
+                    </Button>
                   )}
                   {k !== "pending" && <Badge variant={k === "approved" ? "default" : "destructive"}>{k}</Badge>}
                 </div>
