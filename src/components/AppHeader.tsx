@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Moon, Sun, LogOut, Shield, BookOpen, User as UserIcon, BadgeCheck, Crown, Library, MessageSquare, UserCog } from "lucide-react";
+import { Moon, Sun, LogOut, Shield, BookOpen, User as UserIcon, BadgeCheck, Crown, Library, MessageSquare, UserCog, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -48,6 +48,11 @@ export function AppHeader() {
             </Button>
           )}
           {user && <NotificationBell />}
+          {user && (
+            <Button asChild variant="ghost" size="icon" aria-label="Search">
+              <Link to="/search"><Search className="h-5 w-5" /></Link>
+            </Button>
+          )}
           <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
