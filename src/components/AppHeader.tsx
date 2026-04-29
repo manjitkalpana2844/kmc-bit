@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Moon, Sun, LogOut, Shield, BookOpen, User as UserIcon, BadgeCheck } from "lucide-react";
+import { Moon, Sun, LogOut, Shield, BookOpen, User as UserIcon, BadgeCheck, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -91,6 +91,11 @@ export function AppHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/"><BookOpen className="h-4 w-4 mr-2" />Dashboard</Link>
                 </DropdownMenuItem>
+                {!hasActiveAccess && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/get-access"><Crown className="h-4 w-4 mr-2" />Get Access</Link>
+                  </DropdownMenuItem>
+                )}
                 {isAdmin && (
                   <DropdownMenuItem asChild className="sm:hidden">
                     <Link to="/admin"><Shield className="h-4 w-4 mr-2" />Admin Panel</Link>

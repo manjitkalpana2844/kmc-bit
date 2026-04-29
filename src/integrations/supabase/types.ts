@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       notification_reads: {
         Row: {
           notification_id: string
@@ -77,6 +95,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_requests: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          note: string | null
+          plan: Database["public"]["Enums"]["payment_plan"]
+          proof_path: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          semester: number | null
+          status: Database["public"]["Enums"]["payment_request_status"]
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          plan: Database["public"]["Enums"]["payment_plan"]
+          proof_path: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          semester?: number | null
+          status?: Database["public"]["Enums"]["payment_request_status"]
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          plan?: Database["public"]["Enums"]["payment_plan"]
+          proof_path?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          semester?: number | null
+          status?: Database["public"]["Enums"]["payment_request_status"]
+          transaction_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       pdf_files: {
         Row: {
@@ -252,6 +321,8 @@ export type Database = {
         | "board"
         | "model_questions"
       notification_type: "new_paper" | "exam_reminder" | "announcement"
+      payment_plan: "semester_pass" | "monthly_all_access"
+      payment_request_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -389,6 +460,8 @@ export const Constants = {
         "model_questions",
       ],
       notification_type: ["new_paper", "exam_reminder", "announcement"],
+      payment_plan: ["semester_pass", "monthly_all_access"],
+      payment_request_status: ["pending", "approved", "rejected"],
     },
   },
 } as const

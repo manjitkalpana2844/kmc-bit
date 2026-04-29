@@ -3,11 +3,12 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { AppHeader } from "@/components/AppHeader";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Shield, Upload, FileText, Bell, Users } from "lucide-react";
+import { Shield, Upload, FileText, Bell, Users, Receipt } from "lucide-react";
 import { AdminUpload } from "@/components/admin/AdminUpload";
 import { AdminPdfs } from "@/components/admin/AdminPdfs";
 import { AdminNotifications } from "@/components/admin/AdminNotifications";
 import { AdminUsers } from "@/components/admin/AdminUsers";
+import { AdminPaymentRequests } from "@/components/admin/AdminPaymentRequests";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin")({
@@ -51,11 +52,13 @@ function AdminPage() {
             <TabsTrigger value="pdfs"><FileText className="h-4 w-4 mr-1" />PDFs</TabsTrigger>
             <TabsTrigger value="notifications"><Bell className="h-4 w-4 mr-1" />Notify</TabsTrigger>
             <TabsTrigger value="users"><Users className="h-4 w-4 mr-1" />Users</TabsTrigger>
+            <TabsTrigger value="payments"><Receipt className="h-4 w-4 mr-1" />Payments</TabsTrigger>
           </TabsList>
           <TabsContent value="upload" className="mt-6"><AdminUpload /></TabsContent>
           <TabsContent value="pdfs" className="mt-6"><AdminPdfs /></TabsContent>
           <TabsContent value="notifications" className="mt-6"><AdminNotifications /></TabsContent>
           <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
+          <TabsContent value="payments" className="mt-6"><AdminPaymentRequests /></TabsContent>
         </Tabs>
       </main>
     </div>

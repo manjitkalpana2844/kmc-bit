@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GetAccessRouteImport } from './routes/get-access'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +28,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GetAccessRoute = GetAccessRouteImport.update({
+  id: '/get-access',
+  path: '/get-access',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/get-access': typeof GetAccessRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/get-access': typeof GetAccessRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/get-access': typeof GetAccessRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/get-access'
     | '/login'
     | '/reset-password'
     | '/pdf/$pdfId'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/get-access'
     | '/login'
     | '/reset-password'
     | '/pdf/$pdfId'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/get-access'
     | '/login'
     | '/reset-password'
     | '/pdf/$pdfId'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  GetAccessRoute: typeof GetAccessRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   PdfPdfIdRoute: typeof PdfPdfIdRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/get-access': {
+      id: '/get-access'
+      path: '/get-access'
+      fullPath: '/get-access'
+      preLoaderRoute: typeof GetAccessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-login': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AdminLoginRoute: AdminLoginRoute,
+  GetAccessRoute: GetAccessRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   PdfPdfIdRoute: PdfPdfIdRoute,
