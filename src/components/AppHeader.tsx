@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Moon, Sun, LogOut, Shield, BookOpen, User as UserIcon } from "lucide-react";
+import { Moon, Sun, LogOut, Shield, BookOpen, User as UserIcon, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,7 +16,7 @@ import { AppLogo } from "./AppLogo";
 import { NotificationBell } from "./NotificationBell";
 
 export function AppHeader() {
-  const { user, profile, isAdmin, signOut } = useAuth();
+  const { user, profile, isAdmin, hasActiveAccess, signOut } = useAuth();
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
 
@@ -54,19 +54,37 @@ export function AppHeader() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" className="rounded-full relative">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={profile?.avatar_url ?? undefined} />
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
+                  {hasActiveAccess && (
+                    <BadgeCheck
+                      className="h-4 w-4 absolute -bottom-0.5 -right-0.5 text-primary fill-background"
+                      aria-label="Verified paid member"
+                    />
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
-                  <div className="font-medium">{profile?.name ?? "Student"}</div>
+                  <div className="font-medium flex items-center gap-1">
+                    {profile?.name ?? "Student"}
+                    {hasActiveAccess && (
+                      <BadgeCheck className="h-4 w-4 text-primary" aria-label="Verified" />
+                    )}
+                  </div>
                   <div className="text-xs text-muted-foreground font-normal truncate">{profile?.email}</div>
-                  <div className="text-[10px] mt-1 inline-block px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                    {isAdmin ? "Admin" : "Student"}
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    <span className="text-[10px] inline-block px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                      {isAdmin ? "Admin" : "Student"}
+                    </span>
+                    {hasActiveAccess && (
+                      <span className="text-[10px] inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                        <BadgeCheck className="h-3 w-3" />Verified
+                      </span>
+                    )}
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

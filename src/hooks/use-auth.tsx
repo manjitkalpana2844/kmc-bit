@@ -15,6 +15,7 @@ interface AuthContextValue {
   session: Session | null;
   profile: Profile | null;
   isAdmin: boolean;
+  hasActiveAccess: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
   refreshRole: () => Promise<void>;
@@ -27,15 +28,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [hasActiveAccess, setHasActiveAccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadUserData = async (uid: string) => {
-    const [{ data: prof }, { data: roles }] = await Promise.all([
+    const [{ data: prof }, { data: roles }, { data: access }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", uid),
+      supabase
+        .from("user_access")
+        .select("is_active, expires_at")
+        .eq("user_id", uid)
+        .eq("is_active", true),
     ]);
     setProfile(prof as Profile | null);
     setIsAdmin((roles ?? []).some((r: { role: string }) => r.role === "admin"));
+    const now = Date.now();
+    setHasActiveAccess(
+      (access ?? []).some(
+        (a: { is_active: boolean; expires_at: string | null }) =>
+          a.is_active && (!a.expires_at || new Date(a.expires_at).getTime() > now),
+      ),
+    );
   };
 
   useEffect(() => {
@@ -47,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null);
         setIsAdmin(false);
+        setHasActiveAccess(false);
       }
     });
 
@@ -64,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setProfile(null);
     setIsAdmin(false);
+    setHasActiveAccess(false);
   };
 
   const refreshRole = async () => {
@@ -71,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, isAdmin, loading, signOut, refreshRole }}>
+    <AuthContext.Provider value={{ user, session, profile, isAdmin, hasActiveAccess, loading, signOut, refreshRole }}>
       {children}
     </AuthContext.Provider>
   );
