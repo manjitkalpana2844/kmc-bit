@@ -32,6 +32,33 @@ export type Database = {
         }
         Relationships: []
       }
+      badges: {
+        Row: {
+          category: string
+          code: string
+          description: string
+          icon: string
+          name: string
+          threshold: number
+        }
+        Insert: {
+          category?: string
+          code: string
+          description: string
+          icon?: string
+          name: string
+          threshold?: number
+        }
+        Update: {
+          category?: string
+          code?: string
+          description?: string
+          icon?: string
+          name?: string
+          threshold?: number
+        }
+        Relationships: []
+      }
       bookmarks: {
         Row: {
           created_at: string
@@ -207,6 +234,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pdf_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          pdf_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          pdf_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          pdf_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pdf_downloads: {
         Row: {
           downloaded_at: string
@@ -264,6 +318,60 @@ export type Database = {
           title?: string
           uploaded_by?: string | null
           year?: number
+        }
+        Relationships: []
+      }
+      pdf_notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          pdf_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          pdf_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          pdf_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pdf_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          pdf_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pdf_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pdf_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -393,6 +501,32 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          badge_code: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          badge_code: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          badge_code?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_code_fkey"
+            columns: ["badge_code"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -410,6 +544,33 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_streaks: {
+        Row: {
+          current_streak: number
+          last_active_date: string | null
+          longest_streak: number
+          total_active_days: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_streak?: number
+          last_active_date?: string | null
+          longest_streak?: number
+          total_active_days?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_streak?: number
+          last_active_date?: string | null
+          longest_streak?: number
+          total_active_days?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
