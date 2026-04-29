@@ -32,6 +32,66 @@ export type Database = {
         }
         Relationships: []
       }
+      bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          pdf_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pdf_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pdf_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          admin_reply: string | null
+          created_at: string
+          id: string
+          message: string
+          replied_at: string | null
+          replied_by: string | null
+          status: Database["public"]["Enums"]["feedback_status"]
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_reply?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          replied_at?: string | null
+          replied_by?: string | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_reply?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          replied_at?: string | null
+          replied_by?: string | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_reads: {
         Row: {
           notification_id: string
@@ -147,6 +207,27 @@ export type Database = {
         }
         Relationships: []
       }
+      pdf_downloads: {
+        Row: {
+          downloaded_at: string
+          id: string
+          pdf_id: string
+          user_id: string
+        }
+        Insert: {
+          downloaded_at?: string
+          id?: string
+          pdf_id: string
+          user_id: string
+        }
+        Update: {
+          downloaded_at?: string
+          id?: string
+          pdf_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pdf_files: {
         Row: {
           created_at: string
@@ -186,6 +267,24 @@ export type Database = {
         }
         Relationships: []
       }
+      pdf_views: {
+        Row: {
+          pdf_id: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          pdf_id: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          pdf_id?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -210,6 +309,27 @@ export type Database = {
           id?: string
           login_provider?: string | null
           name?: string | null
+        }
+        Relationships: []
+      }
+      recently_viewed: {
+        Row: {
+          id: string
+          pdf_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          pdf_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          pdf_id?: string
+          user_id?: string
+          viewed_at?: string
         }
         Relationships: []
       }
@@ -306,6 +426,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_pdf_view: { Args: { _pdf_id: string }; Returns: undefined }
       user_can_access_semester: {
         Args: { _semester: number; _user_id: string }
         Returns: boolean
@@ -320,6 +441,7 @@ export type Database = {
         | "final"
         | "board"
         | "model_questions"
+      feedback_status: "open" | "resolved"
       notification_type: "new_paper" | "exam_reminder" | "announcement"
       payment_plan: "semester_pass" | "monthly_all_access"
       payment_request_status: "pending" | "approved" | "rejected"
@@ -459,6 +581,7 @@ export const Constants = {
         "board",
         "model_questions",
       ],
+      feedback_status: ["open", "resolved"],
       notification_type: ["new_paper", "exam_reminder", "announcement"],
       payment_plan: ["semester_pass", "monthly_all_access"],
       payment_request_status: ["pending", "approved", "rejected"],
