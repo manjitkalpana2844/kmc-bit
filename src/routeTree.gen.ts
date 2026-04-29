@@ -14,6 +14,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as GetAccessRouteImport } from './routes/get-access'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -45,6 +46,11 @@ const LibraryRoute = LibraryRouteImport.update({
 const GetAccessRoute = GetAccessRouteImport.update({
   id: '/get-access',
   path: '/get-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/feedback'
     | '/get-access'
     | '/library'
     | '/login'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/feedback'
     | '/get-access'
     | '/library'
     | '/login'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/feedback'
     | '/get-access'
     | '/library'
     | '/login'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  FeedbackRoute: typeof FeedbackRoute
   GetAccessRoute: typeof GetAccessRoute
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/get-access'
       fullPath: '/get-access'
       preLoaderRoute: typeof GetAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-login': {
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AdminLoginRoute: AdminLoginRoute,
+  FeedbackRoute: FeedbackRoute,
   GetAccessRoute: GetAccessRoute,
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
