@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Download, Share2, Lock, ZoomIn, ZoomOut, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Share2, Lock, ZoomIn, ZoomOut, Loader2, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { examTypeLabel, SEMESTER_ORDINAL } from "@/lib/curriculum";
+import { trackPdfView, logDownload } from "@/lib/tracking";
+import { BookmarkButton } from "@/components/BookmarkButton";
 
 export const Route = createFileRoute("/pdf/$pdfId")({
   component: PdfPage,
@@ -32,6 +34,7 @@ function PdfPage() {
   const [locked, setLocked] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [error, setError] = useState<string | null>(null);
+  const [viewCount, setViewCount] = useState<number>(0);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -63,15 +66,20 @@ function PdfPage() {
         .from("pdfs")
         .createSignedUrl(data.file_path, 3600);
       setSignedUrl(signed?.signedUrl ?? null);
+      // Track view + load count
+      trackPdfView(pdfId);
+      const { data: vc } = await supabase.from("pdf_views").select("view_count").eq("pdf_id", pdfId).maybeSingle();
+      setViewCount(Number(vc?.view_count ?? 0) + 1);
     })();
   }, [pdfId, isAdmin]);
 
   const download = async () => {
-    if (!pdf || !signedUrl) return;
+    if (!pdf || !signedUrl || !user) return;
     const a = document.createElement("a");
     a.href = signedUrl;
     a.download = `${pdf.title}.pdf`;
     a.click();
+    logDownload(pdf.id, user.id);
   };
 
   const share = async () => {
@@ -128,8 +136,9 @@ function PdfPage() {
             </button>
             <h1 className="text-xl sm:text-2xl font-bold truncate">{pdf?.title}</h1>
             {pdf && (
-              <p className="text-xs text-muted-foreground">
-                {SEMESTER_ORDINAL(pdf.semester)} Sem · {pdf.subject} · {examTypeLabel(pdf.exam_type)} · {pdf.year}
+              <p className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
+                <span>{SEMESTER_ORDINAL(pdf.semester)} Sem · {pdf.subject} · {examTypeLabel(pdf.exam_type)} · {pdf.year}</span>
+                <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" />{viewCount} views</span>
               </p>
             )}
           </div>
@@ -141,6 +150,7 @@ function PdfPage() {
             <Button variant="outline" size="sm" onClick={() => setZoom((z) => Math.min(200, z + 10))}>
               <ZoomIn className="h-4 w-4" />
             </Button>
+            {pdf && <BookmarkButton pdfId={pdf.id} />}
             <Button variant="outline" size="sm" onClick={share}>
               <Share2 className="h-4 w-4 mr-1" />Share
             </Button>
