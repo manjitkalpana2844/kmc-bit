@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Moon, Sun, LogOut, Shield, BookOpen, User as UserIcon, BadgeCheck, Crown } from "lucide-react";
+import { Moon, Sun, LogOut, Shield, BookOpen, User as UserIcon, BadgeCheck, Crown, Library, MessageSquare, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -90,6 +90,15 @@ export function AppHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/"><BookOpen className="h-4 w-4 mr-2" />Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/library"><Library className="h-4 w-4 mr-2" />My Library</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile"><UserCog className="h-4 w-4 mr-2" />Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/feedback"><MessageSquare className="h-4 w-4 mr-2" />Contact admin</Link>
                 </DropdownMenuItem>
                 {!hasActiveAccess && (
                   <DropdownMenuItem asChild>
