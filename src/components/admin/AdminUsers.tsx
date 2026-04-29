@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2 } from "lucide-react";
+import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -69,6 +69,7 @@ export function AdminUsers() {
           const initials = (u.name ?? u.email ?? "U").slice(0, 2).toUpperCase();
           const userAccess = accessByUser[u.id] ?? [];
           const activeAccess = userAccess.filter((a) => a.is_active);
+          const isVerified = activeAccess.length > 0;
           return (
             <div key={u.id} className="flex items-center gap-3 p-3 border rounded-lg">
               <Avatar className="h-9 w-9">
@@ -76,7 +77,12 @@ export function AdminUsers() {
                 <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm truncate">{u.name ?? "Unnamed"}</div>
+                <div className="font-medium text-sm truncate flex items-center gap-1">
+                  <span className="truncate">{u.name ?? "Unnamed"}</span>
+                  {isVerified && (
+                    <BadgeCheck className="h-4 w-4 text-primary shrink-0" aria-label="Verified paid member" />
+                  )}
+                </div>
                 <div className="text-xs text-muted-foreground truncate">{u.email}</div>
                 {activeAccess.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
