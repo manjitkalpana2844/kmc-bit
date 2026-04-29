@@ -3,13 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck } from "lucide-react";
+import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
+import { Input } from "@/components/ui/input";
+import { downloadCsv } from "@/lib/csv";
 
 interface UserRow {
   id: string; name: string | null; email: string | null; avatar_url: string | null;
@@ -31,6 +33,8 @@ export function AdminUsers() {
   const { user: me } = useAuth();
   const [rows, setRows] = useState<UserRow[]>([]);
   const [accessByUser, setAccessByUser] = useState<Record<string, AccessRow[]>>({});
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "active" | "inactive" | "admin">("all");
 
   const load = async () => {
     const [{ data: profs }, { data: roles }, { data: access }] = await Promise.all([
@@ -61,11 +65,50 @@ export function AdminUsers() {
     load();
   };
 
+  const filtered = rows.filter((u) => {
+    const q = search.trim().toLowerCase();
+    if (q && !((u.name ?? "").toLowerCase().includes(q) || (u.email ?? "").toLowerCase().includes(q))) return false;
+    const hasActive = (accessByUser[u.id] ?? []).some((a) => a.is_active);
+    if (filter === "active" && !hasActive) return false;
+    if (filter === "inactive" && hasActive) return false;
+    if (filter === "admin" && !u.isAdmin) return false;
+    return true;
+  });
+
+  const exportCsv = () => {
+    downloadCsv(`users-${new Date().toISOString().slice(0, 10)}.csv`, filtered.map((u) => ({
+      id: u.id, name: u.name ?? "", email: u.email ?? "",
+      role: u.isAdmin ? "admin" : "student",
+      active_passes: (accessByUser[u.id] ?? []).filter((a) => a.is_active).length,
+      provider: u.login_provider ?? "",
+    })));
+  };
+
   return (
     <Card className="p-6">
-      <h2 className="font-semibold text-lg mb-4 flex items-center gap-2"><Users className="h-5 w-5" />Users ({rows.length})</h2>
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <h2 className="font-semibold text-lg flex items-center gap-2"><Users className="h-5 w-5" />Users ({filtered.length}/{rows.length})</h2>
+        <div className="flex-1" />
+        <Button variant="outline" size="sm" onClick={exportCsv}><Download className="h-4 w-4 mr-1" />Export CSV</Button>
+      </div>
+      <div className="flex flex-wrap gap-2 mb-4">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or email" className="pl-9" />
+        </div>
+        <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
+          <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All users</SelectItem>
+            <SelectItem value="active">Active subscribers</SelectItem>
+            <SelectItem value="inactive">No active access</SelectItem>
+            <SelectItem value="admin">Admins only</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="space-y-2">
-        {rows.map((u) => {
+        {filtered.length === 0 && <p className="text-sm text-muted-foreground">No users match your filters</p>}
+        {filtered.map((u) => {
           const initials = (u.name ?? u.email ?? "U").slice(0, 2).toUpperCase();
           const userAccess = accessByUser[u.id] ?? [];
           const activeAccess = userAccess.filter((a) => a.is_active);
