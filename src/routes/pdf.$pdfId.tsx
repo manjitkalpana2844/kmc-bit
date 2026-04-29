@@ -10,6 +10,12 @@ import { toast } from "sonner";
 import { examTypeLabel, SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { trackPdfView, logDownload } from "@/lib/tracking";
 import { BookmarkButton } from "@/components/BookmarkButton";
+import { OfflineButton } from "@/components/OfflineButton";
+import { PdfRating } from "@/components/PdfRating";
+import { PdfComments } from "@/components/PdfComments";
+import { PdfNotes } from "@/components/PdfNotes";
+import { RelatedPdfs } from "@/components/RelatedPdfs";
+import { checkViewBadges, checkDownloadBadges } from "@/lib/tracking";
 
 export const Route = createFileRoute("/pdf/$pdfId")({
   component: PdfPage,
@@ -68,6 +74,7 @@ function PdfPage() {
       setSignedUrl(signed?.signedUrl ?? null);
       // Track view + load count
       trackPdfView(pdfId);
+      if (user) checkViewBadges(user.id);
       const { data: vc } = await supabase.from("pdf_views").select("view_count").eq("pdf_id", pdfId).maybeSingle();
       setViewCount(Number(vc?.view_count ?? 0) + 1);
     })();
@@ -80,6 +87,7 @@ function PdfPage() {
     a.download = `${pdf.title}.pdf`;
     a.click();
     logDownload(pdf.id, user.id);
+    checkDownloadBadges(user.id);
   };
 
   const share = async () => {
@@ -151,6 +159,14 @@ function PdfPage() {
               <ZoomIn className="h-4 w-4" />
             </Button>
             {pdf && <BookmarkButton pdfId={pdf.id} />}
+            {pdf && (
+              <OfflineButton
+                pdfId={pdf.id}
+                title={pdf.title}
+                signedUrl={signedUrl}
+                meta={{ subject: pdf.subject, semester: pdf.semester, year: pdf.year, exam_type: pdf.exam_type }}
+              />
+            )}
             <Button variant="outline" size="sm" onClick={share}>
               <Share2 className="h-4 w-4 mr-1" />Share
             </Button>
@@ -181,6 +197,22 @@ function PdfPage() {
             </div>
           )}
         </Card>
+
+        {pdf && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
+            <div className="lg:col-span-2 space-y-4">
+              <Card className="p-5">
+                <h3 className="font-semibold mb-2">Rate this paper</h3>
+                <PdfRating pdfId={pdf.id} />
+              </Card>
+              <PdfComments pdfId={pdf.id} />
+            </div>
+            <div className="space-y-4">
+              <PdfNotes pdfId={pdf.id} />
+              <RelatedPdfs pdfId={pdf.id} semester={pdf.semester} subject={pdf.subject} />
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

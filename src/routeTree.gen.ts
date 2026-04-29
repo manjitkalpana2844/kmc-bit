@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
@@ -23,6 +24,11 @@ import { Route as PdfPdfIdRouteImport } from './routes/pdf.$pdfId'
 import { Route as SubjectSemSubjectRouteImport } from './routes/subject.$sem.$subject'
 import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api/public/bootstrap-admin'
 
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/profile'
     | '/reset-password'
+    | '/search'
     | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/api/public/bootstrap-admin'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/profile'
     | '/reset-password'
+    | '/search'
     | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/api/public/bootstrap-admin'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/profile'
     | '/reset-password'
+    | '/search'
     | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/api/public/bootstrap-admin'
@@ -193,6 +205,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SearchRoute: typeof SearchRoute
   PdfPdfIdRoute: typeof PdfPdfIdRoute
   SemesterSemRoute: typeof SemesterSemRoute
   ApiPublicBootstrapAdminRoute: typeof ApiPublicBootstrapAdminRoute
@@ -201,6 +214,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SearchRoute: SearchRoute,
   PdfPdfIdRoute: PdfPdfIdRoute,
   SemesterSemRoute: SemesterSemRoute,
   ApiPublicBootstrapAdminRoute: ApiPublicBootstrapAdminRoute,

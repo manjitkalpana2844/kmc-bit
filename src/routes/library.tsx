@@ -5,8 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, Bookmark, Clock, Download, FileText } from "lucide-react";
+import { ArrowLeft, Bookmark, Clock, Download, FileText, CloudDownload, Trash2 } from "lucide-react";
 import { SEMESTER_ORDINAL, examTypeLabel } from "@/lib/curriculum";
+import { listOfflinePdfs, deleteOfflinePdf, OfflinePdf } from "@/lib/offline";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/library")({ component: LibraryPage });
 
@@ -25,6 +27,9 @@ function LibraryPage() {
   const [bookmarks, setBookmarks] = useState<PdfMeta[]>([]);
   const [recent, setRecent] = useState<PdfMeta[]>([]);
   const [downloads, setDownloads] = useState<(PdfMeta & { downloaded_at: string })[]>([]);
+  const [offline, setOffline] = useState<OfflinePdf[]>([]);
+
+  const loadOffline = async () => setOffline(await listOfflinePdfs());
 
   useEffect(() => { if (!loading && !user) navigate({ to: "/login" }); }, [loading, user]);
 
@@ -52,6 +57,7 @@ function LibraryPage() {
         return m ? { ...m, downloaded_at: x.downloaded_at } : null;
       }).filter(Boolean) as any);
     })();
+    loadOffline();
   }, [user?.id]);
 
   if (!user) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;
@@ -70,6 +76,7 @@ function LibraryPage() {
             <TabsTrigger value="bookmarks"><Bookmark className="h-4 w-4 mr-1" />Bookmarks ({bookmarks.length})</TabsTrigger>
             <TabsTrigger value="recent"><Clock className="h-4 w-4 mr-1" />Recent ({recent.length})</TabsTrigger>
             <TabsTrigger value="downloads"><Download className="h-4 w-4 mr-1" />Downloads ({downloads.length})</TabsTrigger>
+            <TabsTrigger value="offline"><CloudDownload className="h-4 w-4 mr-1" />Offline ({offline.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="bookmarks" className="mt-4 space-y-2">
@@ -83,6 +90,23 @@ function LibraryPage() {
           <TabsContent value="downloads" className="mt-4 space-y-2">
             {downloads.length === 0 && <Empty msg="No downloads yet." />}
             {downloads.map((p) => <PdfRow key={`${p.id}-${p.downloaded_at}`} pdf={p} stamp={p.downloaded_at} />)}
+          </TabsContent>
+          <TabsContent value="offline" className="mt-4 space-y-2">
+            {offline.length === 0 && <Empty msg='No offline PDFs. Open any PDF and tap "Save offline".' />}
+            {offline.map((o) => (
+              <Card key={o.id} className="p-3 flex items-center gap-3">
+                <FileText className="h-5 w-5 text-primary shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <Link to="/pdf/$pdfId" params={{ pdfId: o.id }} className="font-medium text-sm truncate block hover:text-primary">{o.title}</Link>
+                  <div className="text-[10px] text-muted-foreground">
+                    Saved {new Date(o.savedAt).toLocaleString()} · {(o.blob.size / 1024).toFixed(0)} KB
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" onClick={async () => { await deleteOfflinePdf(o.id); loadOffline(); }}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </Card>
+            ))}
           </TabsContent>
         </Tabs>
       </main>

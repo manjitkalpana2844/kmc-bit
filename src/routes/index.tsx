@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { daysLeft } from "@/lib/tracking";
+import { StreakBadge } from "@/components/StreakBadge";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -75,6 +76,8 @@ function Index() {
           </p>
           <p className="opacity-75 text-xs mt-1">Owner: Manjit Rana</p>
         </div>
+
+        <div className="mb-6"><StreakBadge /></div>
 
         <div className="relative mb-6 max-w-xl">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
