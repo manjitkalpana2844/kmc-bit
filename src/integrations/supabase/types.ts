@@ -400,6 +400,7 @@ export type Database = {
           email: string | null
           id: string
           login_provider: string | null
+          motion_pref: string
           name: string | null
         }
         Insert: {
@@ -408,6 +409,7 @@ export type Database = {
           email?: string | null
           id: string
           login_provider?: string | null
+          motion_pref?: string
           name?: string | null
         }
         Update: {
@@ -416,6 +418,7 @@ export type Database = {
           email?: string | null
           id?: string
           login_provider?: string | null
+          motion_pref?: string
           name?: string | null
         }
         Relationships: []
