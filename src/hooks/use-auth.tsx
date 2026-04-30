@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [hasActiveAccess, setHasActiveAccess] = useState(false);
   const [accessExpiresAt, setAccessExpiresAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const authReadyRef = useRef(false);
 
   const resetUserData = () => {
     setProfile(null);
@@ -73,10 +74,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    const markReady = () => {
+      authReadyRef.current = true;
+      setLoading(false);
+    };
+
+    const fallback = window.setTimeout(() => {
+      if (!authReadyRef.current) {
+        console.warn("Auth session check timed out; continuing without blocking the UI.");
+        markReady();
+      }
+    }, 3000);
+
     const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess);
       setUser(sess?.user ?? null);
-      setLoading(false);
+      markReady();
       if (sess?.user) {
         setTimeout(() => loadUserData(sess.user.id), 0);
       } else {
@@ -89,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(({ data: { session: sess } }) => {
         setSession(sess);
         setUser(sess?.user ?? null);
-        setLoading(false);
+        markReady();
         if (sess?.user) loadUserData(sess.user.id);
         else resetUserData();
       })
@@ -98,10 +111,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(null);
         setUser(null);
         resetUserData();
-        setLoading(false);
+        markReady();
       });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      window.clearTimeout(fallback);
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   // Live-sync access changes (admin lock/unlock/grant) to the user's session
