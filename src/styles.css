@@ -217,6 +217,53 @@ button:not([disabled]):active {
   animation: app-scale-in 0.18s ease-out both;
 }
 
+/* Staggered scale-in for internal sections of overlays.
+   Targets common Radix slots inside dialog/popover/dropdown/select content. */
+[data-state="open"][data-slot="dialog-content"] > *,
+[data-state="open"][data-slot="popover-content"] > *,
+[data-state="open"][data-slot="dropdown-menu-content"] > *,
+[data-state="open"][data-slot="select-content"] > *,
+[data-state="open"][data-slot="dialog-content"] [data-slot="dialog-header"],
+[data-state="open"][data-slot="dialog-content"] [data-slot="dialog-title"],
+[data-state="open"][data-slot="dialog-content"] [data-slot="dialog-description"],
+[data-state="open"][data-slot="dialog-content"] [data-slot="dialog-footer"],
+[data-state="open"][data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-label"],
+[data-state="open"][data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"],
+[data-state="open"][data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-separator"],
+[data-state="open"][data-slot="select-content"] [data-slot="select-item"],
+[data-state="open"][data-slot="select-content"] [data-slot="select-label"],
+[data-state="open"][data-slot="select-content"] [data-slot="select-separator"] {
+  opacity: 0;
+  transform: scale(0.97);
+  animation: app-scale-in 0.22s ease-out forwards;
+}
+
+/* Cascade timing — keep total well under the overlay's own animation feel */
+[data-state="open"][data-slot="dialog-content"] > *:nth-child(1),
+[data-state="open"][data-slot="popover-content"] > *:nth-child(1),
+[data-state="open"][data-slot="dropdown-menu-content"] > *:nth-child(1),
+[data-state="open"][data-slot="select-content"] > *:nth-child(1)  { animation-delay: 0.04s; }
+[data-state="open"][data-slot="dialog-content"] > *:nth-child(2),
+[data-state="open"][data-slot="popover-content"] > *:nth-child(2),
+[data-state="open"][data-slot="dropdown-menu-content"] > *:nth-child(2),
+[data-state="open"][data-slot="select-content"] > *:nth-child(2)  { animation-delay: 0.08s; }
+[data-state="open"][data-slot="dialog-content"] > *:nth-child(3),
+[data-state="open"][data-slot="popover-content"] > *:nth-child(3),
+[data-state="open"][data-slot="dropdown-menu-content"] > *:nth-child(3),
+[data-state="open"][data-slot="select-content"] > *:nth-child(3)  { animation-delay: 0.12s; }
+[data-state="open"][data-slot="dialog-content"] > *:nth-child(4),
+[data-state="open"][data-slot="popover-content"] > *:nth-child(4),
+[data-state="open"][data-slot="dropdown-menu-content"] > *:nth-child(4),
+[data-state="open"][data-slot="select-content"] > *:nth-child(4)  { animation-delay: 0.16s; }
+[data-state="open"][data-slot="dialog-content"] > *:nth-child(5),
+[data-state="open"][data-slot="popover-content"] > *:nth-child(5),
+[data-state="open"][data-slot="dropdown-menu-content"] > *:nth-child(5),
+[data-state="open"][data-slot="select-content"] > *:nth-child(5)  { animation-delay: 0.20s; }
+[data-state="open"][data-slot="dialog-content"] > *:nth-child(n+6),
+[data-state="open"][data-slot="popover-content"] > *:nth-child(n+6),
+[data-state="open"][data-slot="dropdown-menu-content"] > *:nth-child(n+6),
+[data-state="open"][data-slot="select-content"] > *:nth-child(n+6) { animation-delay: 0.24s; }
+
 /* Staggered reveal: any container with .stagger-children animates its children in */
 .stagger-children > * {
   opacity: 0;
