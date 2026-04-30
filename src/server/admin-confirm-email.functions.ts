@@ -76,3 +76,35 @@ export const listUnconfirmedUsers = createServerFn({ method: "GET" })
     }
     return { unconfirmed };
   });
+
+export const resendVerificationEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { userId: string }) => {
+    if (!input?.userId || typeof input.userId !== "string") throw new Error("userId required");
+    return { userId: input.userId };
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
+    if (!isAdmin) throw new Response("Forbidden", { status: 403 });
+
+    const { data: u, error: getErr } = await supabaseAdmin.auth.admin.getUserById(data.userId);
+    if (getErr || !u?.user) throw new Response(getErr?.message ?? "User not found", { status: 404 });
+    if (u.user.email_confirmed_at) return { sent: false, reason: "already_confirmed" };
+    if (!u.user.email) throw new Response("User has no email", { status: 400 });
+
+    const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail(u.user.email);
+    if (error) {
+      // Fallback: generate a signup link (this also triggers an email in most setups)
+      const { error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
+        type: "signup",
+        email: u.user.email,
+      });
+      if (linkErr) throw new Response(linkErr.message, { status: 500 });
+    }
+    return { sent: true };
+  });
