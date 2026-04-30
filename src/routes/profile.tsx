@@ -9,9 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Save, Upload, BadgeCheck, Clock, BookMarked, Library, MessageSquare } from "lucide-react";
+import { ArrowLeft, Save, Upload, BadgeCheck, Clock, BookMarked, Library, MessageSquare, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { daysLeft } from "@/lib/tracking";
+import { useMotion } from "@/hooks/use-motion";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/profile")({ component: ProfilePage });
 
@@ -21,6 +23,7 @@ function ProfilePage() {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
+  const { pref, setPref, reduced } = useMotion();
 
   useEffect(() => { if (!loading && !user) navigate({ to: "/login" }); }, [loading, user]);
   useEffect(() => { setName(profile?.name ?? ""); }, [profile?.name]);
@@ -117,6 +120,52 @@ function ProfilePage() {
             </div>
           </Card>
         )}
+
+        {/* Motion preferences */}
+        <Card className="p-5 mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <div className="flex-1">
+              <div className="font-semibold text-sm">Motion & animations</div>
+              <div className="text-xs text-muted-foreground">
+                Reduce motion if animations feel distracting or you prefer a calmer experience.
+              </div>
+            </div>
+            <Switch
+              checked={!reduced}
+              onCheckedChange={(checked) => setPref(checked ? "on" : "off")}
+              aria-label="Toggle animations"
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {([
+              { value: "auto", label: "System", hint: "Follow device" },
+              { value: "on", label: "On", hint: "Full animations" },
+              { value: "off", label: "Off", hint: "Minimal motion" },
+            ] as const).map((opt) => {
+              const active = pref === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setPref(opt.value)}
+                  className={`rounded-lg border px-3 py-2 text-left transition-colors ${
+                    active
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:bg-muted/50"
+                  }`}
+                >
+                  <div className="text-sm font-medium">{opt.label}</div>
+                  <div className="text-[11px] text-muted-foreground">{opt.hint}</div>
+                </button>
+              );
+            })}
+          </div>
+          <div className="text-[11px] text-muted-foreground mt-3">
+            Currently: <span className="font-medium">{reduced ? "Reduced motion" : "Full motion"}</span>
+            {pref === "auto" ? " (from your system settings)" : ""}
+          </div>
+        </Card>
 
         <div className="grid sm:grid-cols-3 gap-3">
           <Link to="/library"><Card className="p-4 hover:shadow-md transition cursor-pointer">
