@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -33,55 +33,91 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [hasActiveAccess, setHasActiveAccess] = useState(false);
   const [accessExpiresAt, setAccessExpiresAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const authReadyRef = useRef(false);
+
+  const resetUserData = () => {
+    setProfile(null);
+    setIsAdmin(false);
+    setHasActiveAccess(false);
+    setAccessExpiresAt(null);
+  };
 
   const loadUserData = async (uid: string) => {
-    const [{ data: prof }, { data: roles }, { data: access }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase
-        .from("user_access")
-        .select("is_active, expires_at")
-        .eq("user_id", uid)
-        .eq("is_active", true),
-    ]);
-    setProfile(prof as Profile | null);
-    setIsAdmin((roles ?? []).some((r: { role: string }) => r.role === "admin"));
-    const now = Date.now();
-    const activeRows = (access ?? []).filter(
-      (a: { is_active: boolean; expires_at: string | null }) =>
-        a.is_active && (!a.expires_at || new Date(a.expires_at).getTime() > now),
-    );
-    setHasActiveAccess(activeRows.length > 0);
-    // Earliest upcoming expiry among active rows (null = lifetime)
-    const expiries = activeRows
-      .map((a: any) => a.expires_at)
-      .filter((e: string | null): e is string => !!e)
-      .sort();
-    setAccessExpiresAt(activeRows.some((a: any) => !a.expires_at) ? null : expiries[0] ?? null);
+    try {
+      const [{ data: prof }, { data: roles }, { data: access }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+        supabase
+          .from("user_access")
+          .select("is_active, expires_at")
+          .eq("user_id", uid)
+          .eq("is_active", true),
+      ]);
+      setProfile(prof as Profile | null);
+      setIsAdmin((roles ?? []).some((r: { role: string }) => r.role === "admin"));
+      const now = Date.now();
+      const activeRows = (access ?? []).filter(
+        (a: { is_active: boolean; expires_at: string | null }) =>
+          a.is_active && (!a.expires_at || new Date(a.expires_at).getTime() > now),
+      );
+      setHasActiveAccess(activeRows.length > 0);
+      // Earliest upcoming expiry among active rows (null = lifetime)
+      const expiries = activeRows
+        .map((a: any) => a.expires_at)
+        .filter((e: string | null): e is string => !!e)
+        .sort();
+      setAccessExpiresAt(activeRows.some((a: any) => !a.expires_at) ? null : expiries[0] ?? null);
+    } catch (error) {
+      console.error("Unable to load user data", error);
+      resetUserData();
+    }
   };
 
   useEffect(() => {
+    const markReady = () => {
+      authReadyRef.current = true;
+      setLoading(false);
+    };
+
+    const fallback = window.setTimeout(() => {
+      if (!authReadyRef.current) {
+        console.warn("Auth session check timed out; continuing without blocking the UI.");
+        markReady();
+      }
+    }, 3000);
+
     const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess);
       setUser(sess?.user ?? null);
+      markReady();
       if (sess?.user) {
         setTimeout(() => loadUserData(sess.user.id), 0);
       } else {
-        setProfile(null);
-        setIsAdmin(false);
-        setHasActiveAccess(false);
-        setAccessExpiresAt(null);
+        resetUserData();
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session: sess } }) => {
-      setSession(sess);
-      setUser(sess?.user ?? null);
-      if (sess?.user) loadUserData(sess.user.id).finally(() => setLoading(false));
-      else setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session: sess } }) => {
+        setSession(sess);
+        setUser(sess?.user ?? null);
+        markReady();
+        if (sess?.user) loadUserData(sess.user.id);
+        else resetUserData();
+      })
+      .catch((error) => {
+        console.error("Unable to restore session", error);
+        setSession(null);
+        setUser(null);
+        resetUserData();
+        markReady();
+      });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      window.clearTimeout(fallback);
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   // Live-sync access changes (admin lock/unlock/grant) to the user's session
