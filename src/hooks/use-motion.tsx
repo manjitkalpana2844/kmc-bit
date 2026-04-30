@@ -9,6 +9,7 @@ interface MotionCtx {
   setPref: (p: MotionPref) => void;
   reduced: boolean; // true if motion should be reduced right now
   syncing: boolean;
+  lowPower: boolean; // true if device looks low-power (infinite anims paused)
 }
 
 const Ctx = createContext<MotionCtx | undefined>(undefined);
@@ -37,11 +38,39 @@ function apply(reduced: boolean) {
   else html.removeAttribute("data-reduce-motion");
 }
 
+/**
+ * Heuristic: is this a low-power device where infinite animations
+ * (pulse rings, floating glyphs, shimmer) are likely to cause jank
+ * or drain battery?
+ */
+function detectLowPower(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  if (typeof mem === "number" && mem > 0 && mem <= 2) return true;
+  if (typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) {
+    const ua = navigator.userAgent || "";
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(ua)) return true;
+  }
+  type NetInfo = { saveData?: boolean; effectiveType?: string };
+  const conn = (navigator as Navigator & { connection?: NetInfo }).connection;
+  if (conn?.saveData) return true;
+  if (conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g") return true;
+  return false;
+}
+
+function applyLowPower(low: boolean) {
+  if (typeof document === "undefined") return;
+  const html = document.documentElement;
+  if (low) html.setAttribute("data-low-power", "true");
+  else html.removeAttribute("data-low-power");
+}
+
 export function MotionProvider({ children }: { children: ReactNode }) {
   const [pref, setPrefState] = useState<MotionPref>("auto");
   const [reduced, setReduced] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [lowPower, setLowPower] = useState(false);
 
   // Initial sync (client only)
   useEffect(() => {
@@ -50,6 +79,27 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     setPrefState(p);
     setReduced(r);
     apply(r);
+    const low = detectLowPower();
+    setLowPower(low);
+    applyLowPower(low);
+  }, []);
+
+  // Watch network connection (saveData / effectiveType) for changes
+  useEffect(() => {
+    if (typeof navigator === "undefined") return;
+    type NetInfo = {
+      addEventListener?: (t: string, cb: () => void) => void;
+      removeEventListener?: (t: string, cb: () => void) => void;
+    };
+    const conn = (navigator as Navigator & { connection?: NetInfo }).connection;
+    if (!conn?.addEventListener) return;
+    const handler = () => {
+      const low = detectLowPower();
+      setLowPower(low);
+      applyLowPower(low);
+    };
+    conn.addEventListener("change", handler);
+    return () => conn.removeEventListener?.("change", handler);
   }, []);
 
   // Track auth + pull remote preference whenever the user changes
@@ -121,7 +171,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     }
   }, [userId]);
 
-  return <Ctx.Provider value={{ pref, setPref, reduced, syncing }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ pref, setPref, reduced, syncing, lowPower }}>{children}</Ctx.Provider>;
 }
 
 export function useMotion() {
