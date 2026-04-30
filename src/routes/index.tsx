@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Lock, Search, BookOpen, Crown, Clock, FileText, ChevronRight, GraduationCap, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,10 @@ function Index() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [locked, setLocked] = useState<Record<number, boolean>>({});
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [showSuggest, setShowSuggest] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -70,6 +74,84 @@ function Index() {
     }
     return out.slice(0, 12);
   }, [query, allSemesters]);
+
+  // Reset highlighted suggestion as the query changes
+  useEffect(() => {
+    setActiveIdx(0);
+  }, [query]);
+
+  // Keep the active suggestion scrolled into view
+  useEffect(() => {
+    const el = listRef.current?.querySelector<HTMLElement>(`[data-idx="${activeIdx}"]`);
+    el?.scrollIntoView({ block: "nearest" });
+  }, [activeIdx, subjectMatches.length]);
+
+  function openSubject(sem: number, subject: string) {
+    const isLocked = locked[sem] ?? true;
+    if (isLocked) return;
+    setShowSuggest(false);
+    navigate({
+      to: "/subject/$sem/$subject",
+      params: { sem: String(sem), subject },
+    });
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!query || subjectMatches.length === 0) {
+      if (e.key === "Escape") {
+        setSearch("");
+        setShowSuggest(false);
+      }
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setShowSuggest(true);
+      setActiveIdx((i) => (i + 1) % subjectMatches.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setShowSuggest(true);
+      setActiveIdx((i) => (i - 1 + subjectMatches.length) % subjectMatches.length);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setActiveIdx(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setActiveIdx(subjectMatches.length - 1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const m = subjectMatches[activeIdx];
+      if (m) openSubject(m.sem, m.subject);
+    } else if (e.key === "Escape") {
+      setShowSuggest(false);
+    }
+  }
+
+  // Highlight matching substring inside a subject label
+  function Highlight({ text }: { text: string }) {
+    if (!query) return <>{text}</>;
+    const lower = text.toLowerCase();
+    const parts: React.ReactNode[] = [];
+    let i = 0;
+    while (i < text.length) {
+      const idx = lower.indexOf(query, i);
+      if (idx === -1) {
+        parts.push(text.slice(i));
+        break;
+      }
+      if (idx > i) parts.push(text.slice(i, idx));
+      parts.push(
+        <mark
+          key={idx}
+          className="bg-primary/20 text-foreground rounded px-0.5"
+        >
+          {text.slice(idx, idx + query.length)}
+        </mark>,
+      );
+      i = idx + query.length;
+    }
+    return <>{parts}</>;
+  }
 
   const unlockedCount = allSemesters.filter((s) => !(locked[s] ?? true)).length;
   const totalSubjects = allSemesters.reduce((n, s) => n + SEMESTER_SUBJECTS[s].length, 0);
@@ -155,19 +237,100 @@ function Index() {
         <div className="relative mb-6 max-w-xl">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
+            ref={inputRef}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setShowSuggest(true); }}
+            onFocus={() => setShowSuggest(true)}
+            onBlur={() => setTimeout(() => setShowSuggest(false), 120)}
+            onKeyDown={handleKeyDown}
             placeholder="Search subjects (e.g. Java, DBMS, AI…)"
             className="pl-9 h-11"
+            role="combobox"
+            aria-expanded={showSuggest && query.length > 0}
+            aria-controls="subject-suggest-list"
+            aria-activedescendant={
+              showSuggest && subjectMatches[activeIdx]
+                ? `suggest-${activeIdx}`
+                : undefined
+            }
+            autoComplete="off"
           />
           {query && (
             <button
               type="button"
-              onClick={() => setSearch("")}
+              onClick={() => { setSearch(""); setShowSuggest(false); inputRef.current?.focus(); }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded"
             >
               Clear
             </button>
+          )}
+
+          {/* Auto-suggest dropdown */}
+          {showSuggest && query && (
+            <Card
+              className="absolute z-30 left-0 right-0 mt-2 p-1 max-h-80 overflow-auto shadow-lg animate-fade-in"
+            >
+              {subjectMatches.length === 0 ? (
+                <div className="px-3 py-3 text-sm text-muted-foreground">
+                  No matches for "<span className="text-foreground font-medium">{query}</span>"
+                </div>
+              ) : (
+                <ul
+                  id="subject-suggest-list"
+                  ref={listRef}
+                  role="listbox"
+                  className="text-sm"
+                >
+                  {subjectMatches.map(({ sem, subject }, idx) => {
+                    const isLocked = locked[sem] ?? true;
+                    const isActive = idx === activeIdx;
+                    return (
+                      <li
+                        key={`${sem}-${subject}`}
+                        id={`suggest-${idx}`}
+                        data-idx={idx}
+                        role="option"
+                        aria-selected={isActive}
+                        onMouseEnter={() => setActiveIdx(idx)}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          openSubject(sem, subject);
+                        }}
+                        className={`flex items-center gap-3 px-2 py-2 rounded-md cursor-pointer ${
+                          isActive ? "bg-muted" : ""
+                        } ${isLocked ? "opacity-60 cursor-not-allowed" : ""}`}
+                      >
+                        <div
+                          className="h-7 w-7 rounded-md flex items-center justify-center text-[11px] font-bold text-primary-foreground shrink-0"
+                          style={{ background: isLocked ? "var(--muted)" : "var(--gradient-primary)" }}
+                        >
+                          {sem}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="truncate flex items-center gap-1.5">
+                            <FileText className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span className="truncate"><Highlight text={subject} /></span>
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {SEMESTER_ORDINAL(sem)} Semester
+                          </div>
+                        </div>
+                        {isLocked ? (
+                          <Lock className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <div className="px-2 py-1.5 text-[10px] text-muted-foreground border-t mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+                <span><kbd className="px-1 rounded bg-muted">↑</kbd> <kbd className="px-1 rounded bg-muted">↓</kbd> navigate</span>
+                <span><kbd className="px-1 rounded bg-muted">Enter</kbd> open</span>
+                <span><kbd className="px-1 rounded bg-muted">Esc</kbd> close</span>
+              </div>
+            </Card>
           )}
         </div>
 
@@ -194,7 +357,7 @@ function Index() {
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate flex items-center gap-2">
                           <FileText className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                          {subject}
+                          <Highlight text={subject} />
                         </div>
                         <div className="text-[11px] text-muted-foreground">{SEMESTER_ORDINAL(sem)} Semester</div>
                       </div>
