@@ -101,7 +101,7 @@ export const resendVerificationEmail = createServerFn({ method: "POST" })
     if (error) {
       // Fallback: generate a signup link (this also triggers an email in most setups)
       const { error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
-        type: "signup",
+        type: "magiclink",
         email: u.user.email,
       });
       if (linkErr) throw new Response(linkErr.message, { status: 500 });
