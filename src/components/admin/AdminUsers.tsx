@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download } from "lucide-react";
+import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download, MailCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -12,6 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { Input } from "@/components/ui/input";
 import { downloadCsv } from "@/lib/csv";
+import { Checkbox } from "@/components/ui/checkbox";
+import { confirmUserEmails, listUnconfirmedUsers } from "@/server/admin-confirm-email.functions";
 
 interface UserRow {
   id: string; name: string | null; email: string | null; avatar_url: string | null;
@@ -35,6 +37,9 @@ export function AdminUsers() {
   const [accessByUser, setAccessByUser] = useState<Record<string, AccessRow[]>>({});
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "inactive" | "admin">("all");
+  const [unconfirmed, setUnconfirmed] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [busy, setBusy] = useState(false);
 
   const load = async () => {
     const [{ data: profs }, { data: roles }, { data: access }] = await Promise.all([
@@ -49,6 +54,14 @@ export function AdminUsers() {
       (map[a.user_id] ??= []).push(a as AccessRow);
     });
     setAccessByUser(map);
+
+    try {
+      const res = await listUnconfirmedUsers();
+      setUnconfirmed(new Set(res.unconfirmed.map((u) => u.id)));
+    } catch (e: any) {
+      // non-fatal; just hide unconfirmed badges
+      console.warn("listUnconfirmedUsers failed", e);
+    }
   };
   useEffect(() => { load(); }, []);
 
@@ -84,11 +97,48 @@ export function AdminUsers() {
     })));
   };
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const confirmIds = async (ids: string[], label: string) => {
+    if (ids.length === 0) return toast.info("No users to confirm");
+    setBusy(true);
+    try {
+      const res = await confirmUserEmails({ data: { userIds: ids } });
+      toast.success(`${label}: ${res.confirmed} confirmed, ${res.skipped} already confirmed${res.errors.length ? `, ${res.errors.length} errors` : ""}`);
+      if (res.errors.length) console.warn("Confirm errors:", res.errors);
+      setSelected(new Set());
+      await load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to confirm emails");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const confirmAllUnconfirmed = () => confirmIds(Array.from(unconfirmed), "All unconfirmed");
+  const confirmSelected = () => confirmIds(Array.from(selected), "Selected");
+  const confirmFiltered = () => confirmIds(filtered.filter((u) => unconfirmed.has(u.id)).map((u) => u.id), "Filtered unconfirmed");
+
   return (
     <Card className="p-6">
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <h2 className="font-semibold text-lg flex items-center gap-2"><Users className="h-5 w-5" />Users ({filtered.length}/{rows.length})</h2>
         <div className="flex-1" />
+        <Button variant="outline" size="sm" onClick={confirmSelected} disabled={busy || selected.size === 0}>
+          <MailCheck className="h-4 w-4 mr-1" />Confirm selected ({selected.size})
+        </Button>
+        <Button variant="outline" size="sm" onClick={confirmFiltered} disabled={busy}>
+          <MailCheck className="h-4 w-4 mr-1" />Confirm filtered unconfirmed
+        </Button>
+        <Button variant="default" size="sm" onClick={confirmAllUnconfirmed} disabled={busy || unconfirmed.size === 0}>
+          <MailCheck className="h-4 w-4 mr-1" />Confirm all ({unconfirmed.size})
+        </Button>
         <Button variant="outline" size="sm" onClick={exportCsv}><Download className="h-4 w-4 mr-1" />Export CSV</Button>
       </div>
       <div className="flex flex-wrap gap-2 mb-4">
@@ -113,8 +163,14 @@ export function AdminUsers() {
           const userAccess = accessByUser[u.id] ?? [];
           const activeAccess = userAccess.filter((a) => a.is_active);
           const isVerified = activeAccess.length > 0;
+          const needsConfirm = unconfirmed.has(u.id);
           return (
             <div key={u.id} className="flex items-center gap-3 p-3 border rounded-lg">
+              <Checkbox
+                checked={selected.has(u.id)}
+                onCheckedChange={() => toggleSelect(u.id)}
+                aria-label="Select user"
+              />
               <Avatar className="h-9 w-9">
                 <AvatarImage src={u.avatar_url ?? undefined} />
                 <AvatarFallback>{initials}</AvatarFallback>
@@ -127,6 +183,9 @@ export function AdminUsers() {
                   )}
                 </div>
                 <div className="text-xs text-muted-foreground truncate">{u.email}</div>
+                {needsConfirm && (
+                  <Badge variant="destructive" className="text-[10px] mt-1">Email unconfirmed</Badge>
+                )}
                 {activeAccess.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {activeAccess.map((a) => (
@@ -142,6 +201,11 @@ export function AdminUsers() {
               <span className={`text-[10px] px-2 py-0.5 rounded-full ${u.isAdmin ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
                 {u.isAdmin ? "Admin" : "Student"}
               </span>
+              {needsConfirm && (
+                <Button variant="outline" size="sm" onClick={() => confirmIds([u.id], u.email ?? "User")} disabled={busy}>
+                  <MailCheck className="h-4 w-4 mr-1" />Confirm
+                </Button>
+              )}
               <AccessDialog user={u} access={userAccess} onChange={load} />
               {u.id !== me?.id && (
                 <Button variant="outline" size="sm" onClick={() => toggleAdmin(u)}>
