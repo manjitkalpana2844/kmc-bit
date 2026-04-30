@@ -156,10 +156,27 @@ function Index() {
   const unlockedCount = allSemesters.filter((s) => !(locked[s] ?? true)).length;
   const totalSubjects = allSemesters.reduce((n, s) => n + SEMESTER_SUBJECTS[s].length, 0);
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading…</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="w-full max-w-sm text-center">
+          <AppHeader />
+          <h1 className="mt-8 text-2xl font-bold text-foreground">Sign in to continue</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Access your BIT question bank dashboard and saved study tools.
+          </p>
+          <Button asChild className="mt-6 w-full">
+            <Link to="/login">Open login</Link>
+          </Button>
+        </div>
       </div>
     );
   }
