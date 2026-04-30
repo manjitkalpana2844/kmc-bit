@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download, MailCheck } from "lucide-react";
+import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download, MailCheck, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -13,7 +13,7 @@ import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { Input } from "@/components/ui/input";
 import { downloadCsv } from "@/lib/csv";
 import { Checkbox } from "@/components/ui/checkbox";
-import { confirmUserEmails, listUnconfirmedUsers } from "@/server/admin-confirm-email.functions";
+import { confirmUserEmails, listUnconfirmedUsers, resendVerificationEmail } from "@/server/admin-confirm-email.functions";
 
 interface UserRow {
   id: string; name: string | null; email: string | null; avatar_url: string | null;
@@ -204,6 +204,25 @@ export function AdminUsers() {
               {needsConfirm && (
                 <Button variant="outline" size="sm" onClick={() => confirmIds([u.id], u.email ?? "User")} disabled={busy}>
                   <MailCheck className="h-4 w-4 mr-1" />Confirm
+                </Button>
+              )}
+              {needsConfirm && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={busy}
+                  onClick={async () => {
+                    try {
+                      const res = await resendVerificationEmail({ data: { userId: u.id } });
+                      if (res.sent) toast.success(`Verification email sent to ${u.email}`);
+                      else toast.info("User is already confirmed");
+                      load();
+                    } catch (e: any) {
+                      toast.error(e?.message ?? "Failed to resend email");
+                    }
+                  }}
+                >
+                  <Send className="h-4 w-4 mr-1" />Resend
                 </Button>
               )}
               <AccessDialog user={u} access={userAccess} onChange={load} />
