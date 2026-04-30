@@ -332,3 +332,22 @@ html[data-reduce-motion="true"] *::after {
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
 }
+
+/*
+ * Low-power devices: pause/limit ambient infinite animations to save
+ * battery and avoid jank. We keep purposeful, finite UI animations
+ * (fade-in, scale-in, slide-up) intact so the app still feels responsive.
+ */
+html[data-low-power="true"] .animate-float,
+html[data-low-power="true"] .animate-pulse-ring,
+html[data-low-power="true"] .animate-shimmer {
+  animation: none !important;
+}
+/* Catch-all: any other infinite keyframe animation runs once instead of looping */
+@media (max-width: 768px) {
+  html[data-low-power="true"] *,
+  html[data-low-power="true"] *::before,
+  html[data-low-power="true"] *::after {
+    animation-iteration-count: 1 !important;
+  }
+}
