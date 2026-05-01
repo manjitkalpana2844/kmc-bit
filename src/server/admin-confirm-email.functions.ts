@@ -16,7 +16,7 @@ export const confirmUserEmails = createServerFn({ method: "POST" })
       .select("role")
       .eq("user_id", userId);
     const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
-    if (!isAdmin) throw new Response("Forbidden", { status: 403 });
+    if (!isAdmin) throw new Error("Forbidden: admin role required");
 
     let confirmed = 0;
     let skipped = 0;
@@ -58,7 +58,7 @@ export const listUnconfirmedUsers = createServerFn({ method: "GET" })
       .select("role")
       .eq("user_id", userId);
     const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
-    if (!isAdmin) throw new Response("Forbidden", { status: 403 });
+    if (!isAdmin) throw new Error("Forbidden: admin role required");
 
     const unconfirmed: { id: string; email: string | null }[] = [];
     let page = 1;
@@ -66,7 +66,7 @@ export const listUnconfirmedUsers = createServerFn({ method: "GET" })
     // Cap pages to avoid runaway loops
     while (page <= 25) {
       const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
-      if (error) throw new Response(error.message, { status: 500 });
+      if (error) throw new Error(`Failed to list users: ${error.message}`);
       const users = data?.users ?? [];
       for (const u of users) {
         if (!u.email_confirmed_at) unconfirmed.push({ id: u.id, email: u.email ?? null });
@@ -90,12 +90,12 @@ export const resendVerificationEmail = createServerFn({ method: "POST" })
       .select("role")
       .eq("user_id", userId);
     const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
-    if (!isAdmin) throw new Response("Forbidden", { status: 403 });
+    if (!isAdmin) throw new Error("Forbidden: admin role required");
 
     const { data: u, error: getErr } = await supabaseAdmin.auth.admin.getUserById(data.userId);
-    if (getErr || !u?.user) throw new Response(getErr?.message ?? "User not found", { status: 404 });
+    if (getErr || !u?.user) throw new Error(getErr?.message ?? "User not found");
     if (u.user.email_confirmed_at) return { sent: false, reason: "already_confirmed" };
-    if (!u.user.email) throw new Response("User has no email", { status: 400 });
+    if (!u.user.email) throw new Error("User has no email");
 
     const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail(u.user.email);
     if (error) {
@@ -104,7 +104,7 @@ export const resendVerificationEmail = createServerFn({ method: "POST" })
         type: "magiclink",
         email: u.user.email,
       });
-      if (linkErr) throw new Response(linkErr.message, { status: 500 });
+      if (linkErr) throw new Error(`Failed to send verification: ${linkErr.message}`);
     }
     return { sent: true };
   });
