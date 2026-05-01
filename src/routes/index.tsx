@@ -13,6 +13,7 @@ import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { daysLeft } from "@/lib/tracking";
 import { StreakBadge } from "@/components/StreakBadge";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -56,7 +57,20 @@ function Index() {
     [],
   );
 
-  const query = search.trim().toLowerCase();
+  const rawQuery = search.trim().toLowerCase();
+  const [debouncedQuery, setDebouncedQuery] = useState(rawQuery);
+  const isComputing = rawQuery !== debouncedQuery;
+
+  useEffect(() => {
+    if (rawQuery === "") {
+      setDebouncedQuery("");
+      return;
+    }
+    const t = window.setTimeout(() => setDebouncedQuery(rawQuery), 120);
+    return () => window.clearTimeout(t);
+  }, [rawQuery]);
+
+  const query = debouncedQuery;
 
   const filtered = useMemo(() => {
     if (!query) return allSemesters;
@@ -300,12 +314,33 @@ function Index() {
           )}
 
           {/* Auto-suggest dropdown */}
-          {showSuggest && query && (
+          {showSuggest && rawQuery && (
             <Card
               className="absolute z-30 left-0 right-0 mt-2 p-1 max-h-80 overflow-auto shadow-lg animate-fade-in"
               onPointerDown={() => { suppressBlurRef.current = true; }}
             >
-              {subjectMatches.length === 0 ? (
+              {isComputing ? (
+                <ul
+                  className="text-sm"
+                  aria-busy="true"
+                  aria-live="polite"
+                  aria-label="Loading suggestions"
+                >
+                  {[0, 1, 2, 3].map((i) => (
+                    <li
+                      key={i}
+                      className="flex items-center gap-3 px-2 py-2 rounded-md"
+                    >
+                      <Skeleton className="h-7 w-7 rounded-md shrink-0" />
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        <Skeleton className="h-3.5 w-3/5" />
+                        <Skeleton className="h-2.5 w-1/3" />
+                      </div>
+                      <Skeleton className="h-4 w-4 rounded-sm" />
+                    </li>
+                  ))}
+                </ul>
+              ) : subjectMatches.length === 0 ? (
                 <div className="px-3 py-3 text-sm text-muted-foreground">
                   No matches for "<span className="text-foreground font-medium">{query}</span>"
                 </div>
