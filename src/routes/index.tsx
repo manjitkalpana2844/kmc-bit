@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { daysLeft } from "@/lib/tracking";
 import { StreakBadge } from "@/components/StreakBadge";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -88,7 +89,12 @@ function Index() {
 
   function openSubject(sem: number, subject: string) {
     const isLocked = locked[sem] ?? true;
-    if (isLocked) return;
+    if (isLocked) {
+      toast.error(`${SEMESTER_ORDINAL(sem)} Semester is locked`, {
+        description: `"${subject}" isn't available yet. Please check back later or contact admin.`,
+      });
+      return;
+    }
     setShowSuggest(false);
     navigate({
       to: "/subject/$sem/$subject",
@@ -308,14 +314,20 @@ function Index() {
                         data-idx={idx}
                         role="option"
                         aria-selected={isActive}
+                        tabIndex={-1}
                         onMouseEnter={() => setActiveIdx(idx)}
                         onMouseDown={(e) => {
                           e.preventDefault();
                           openSubject(sem, subject);
                         }}
-                        className={`flex items-center gap-3 px-2 py-2 rounded-md cursor-pointer ${
+                        onTouchStart={(e) => {
+                          e.preventDefault();
+                          openSubject(sem, subject);
+                        }}
+                        onClick={() => openSubject(sem, subject)}
+                        className={`flex items-center gap-3 px-2 py-2 rounded-md cursor-pointer touch-manipulation select-none ${
                           isActive ? "bg-muted" : ""
-                        } ${isLocked ? "opacity-60 cursor-not-allowed" : ""}`}
+                        } ${isLocked ? "opacity-60" : ""}`}
                       >
                         <div
                           className="h-7 w-7 rounded-md flex items-center justify-center text-[11px] font-bold text-primary-foreground shrink-0"
@@ -388,7 +400,14 @@ function Index() {
                   return (
                     <li key={`${sem}-${subject}`}>
                       {isLocked ? (
-                        <div className="opacity-60">{row}</div>
+                        <button
+                          type="button"
+                          onClick={() => openSubject(sem, subject)}
+                          className="block w-full text-left opacity-60 hover:bg-muted/50 rounded-md transition-colors touch-manipulation"
+                          aria-label={`${subject} (locked)`}
+                        >
+                          {row}
+                        </button>
                       ) : (
                         <Link
                           to="/subject/$sem/$subject"
