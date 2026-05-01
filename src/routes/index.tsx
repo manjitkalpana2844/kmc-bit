@@ -400,7 +400,14 @@ function Index() {
                   return (
                     <li key={`${sem}-${subject}`}>
                       {isLocked ? (
-                        <div className="opacity-60">{row}</div>
+                        <button
+                          type="button"
+                          onClick={() => openSubject(sem, subject)}
+                          className="block w-full text-left opacity-60 hover:bg-muted/50 rounded-md transition-colors touch-manipulation"
+                          aria-label={`${subject} (locked)`}
+                        >
+                          {row}
+                        </button>
                       ) : (
                         <Link
                           to="/subject/$sem/$subject"
