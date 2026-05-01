@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { AppHeader } from "@/components/AppHeader";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Shield, Upload, FileText, Bell, Users, Receipt, BarChart3, MessageSquare, TrendingUp } from "lucide-react";
+import { Shield, Upload, FileText, Bell, Users, Receipt, BarChart3, MessageSquare, TrendingUp, GraduationCap, Sliders, ToggleRight } from "lucide-react";
 import { AdminUpload } from "@/components/admin/AdminUpload";
 import { AdminPdfs } from "@/components/admin/AdminPdfs";
 import { AdminNotifications } from "@/components/admin/AdminNotifications";
@@ -12,6 +12,9 @@ import { AdminPaymentRequests } from "@/components/admin/AdminPaymentRequests";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminFeedback } from "@/components/admin/AdminFeedback";
 import { AdminRevenue } from "@/components/admin/AdminRevenue";
+import { AdminSemesters } from "@/components/admin/AdminSemesters";
+import { AdminSettings } from "@/components/admin/AdminSettings";
+import { AdminFeatures } from "@/components/admin/AdminFeatures";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin")({
@@ -54,20 +57,26 @@ function AdminPage() {
             <TabsTrigger value="stats"><BarChart3 className="h-4 w-4 mr-1" />Stats</TabsTrigger>
             <TabsTrigger value="upload"><Upload className="h-4 w-4 mr-1" />Upload</TabsTrigger>
             <TabsTrigger value="pdfs"><FileText className="h-4 w-4 mr-1" />PDFs</TabsTrigger>
+            <TabsTrigger value="semesters"><GraduationCap className="h-4 w-4 mr-1" />Semesters</TabsTrigger>
             <TabsTrigger value="notifications"><Bell className="h-4 w-4 mr-1" />Notify</TabsTrigger>
             <TabsTrigger value="users"><Users className="h-4 w-4 mr-1" />Users</TabsTrigger>
             <TabsTrigger value="payments"><Receipt className="h-4 w-4 mr-1" />Payments</TabsTrigger>
             <TabsTrigger value="revenue"><TrendingUp className="h-4 w-4 mr-1" />Revenue</TabsTrigger>
             <TabsTrigger value="feedback"><MessageSquare className="h-4 w-4 mr-1" />Feedback</TabsTrigger>
+            <TabsTrigger value="features"><ToggleRight className="h-4 w-4 mr-1" />Features</TabsTrigger>
+            <TabsTrigger value="settings"><Sliders className="h-4 w-4 mr-1" />Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="stats" className="mt-6"><AdminStats /></TabsContent>
           <TabsContent value="upload" className="mt-6"><AdminUpload /></TabsContent>
           <TabsContent value="pdfs" className="mt-6"><AdminPdfs /></TabsContent>
+          <TabsContent value="semesters" className="mt-6"><AdminSemesters /></TabsContent>
           <TabsContent value="notifications" className="mt-6"><AdminNotifications /></TabsContent>
           <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
           <TabsContent value="payments" className="mt-6"><AdminPaymentRequests /></TabsContent>
           <TabsContent value="revenue" className="mt-6"><AdminRevenue /></TabsContent>
           <TabsContent value="feedback" className="mt-6"><AdminFeedback /></TabsContent>
+          <TabsContent value="features" className="mt-6"><AdminFeatures /></TabsContent>
+          <TabsContent value="settings" className="mt-6"><AdminSettings /></TabsContent>
         </Tabs>
       </main>
     </div>
