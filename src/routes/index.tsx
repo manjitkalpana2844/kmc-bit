@@ -27,6 +27,7 @@ function Index() {
   const [showSuggest, setShowSuggest] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const suppressBlurRef = useRef(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -264,7 +265,17 @@ function Index() {
             value={search}
             onChange={(e) => { setSearch(e.target.value); setShowSuggest(true); }}
             onFocus={() => setShowSuggest(true)}
-            onBlur={() => setTimeout(() => setShowSuggest(false), 120)}
+            onBlur={() => {
+              // If the user is tapping/clicking inside the suggestion list,
+              // don't close — the click handler will close it after firing.
+              setTimeout(() => {
+                if (suppressBlurRef.current) {
+                  suppressBlurRef.current = false;
+                  return;
+                }
+                setShowSuggest(false);
+              }, 150);
+            }}
             onKeyDown={handleKeyDown}
             placeholder="Search subjects (e.g. Java, DBMS, AI…)"
             className="pl-9 h-11"
@@ -292,6 +303,7 @@ function Index() {
           {showSuggest && query && (
             <Card
               className="absolute z-30 left-0 right-0 mt-2 p-1 max-h-80 overflow-auto shadow-lg animate-fade-in"
+              onPointerDown={() => { suppressBlurRef.current = true; }}
             >
               {subjectMatches.length === 0 ? (
                 <div className="px-3 py-3 text-sm text-muted-foreground">
@@ -316,14 +328,6 @@ function Index() {
                         aria-selected={isActive}
                         tabIndex={-1}
                         onMouseEnter={() => setActiveIdx(idx)}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          openSubject(sem, subject);
-                        }}
-                        onTouchStart={(e) => {
-                          e.preventDefault();
-                          openSubject(sem, subject);
-                        }}
                         onClick={() => openSubject(sem, subject)}
                         className={`flex items-center gap-3 px-2 py-2 rounded-md cursor-pointer touch-manipulation select-none ${
                           isActive ? "bg-muted" : ""
