@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2, User, Sparkles, ShieldCheck, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -79,17 +79,36 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-background">
-      <div className="w-full max-w-md">
+    <div className="relative min-h-screen flex items-center justify-center px-4 py-10 bg-background overflow-hidden">
+      {/* Branded background accents */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 -left-32 h-80 w-80 rounded-full opacity-30 blur-3xl"
+        style={{ background: "var(--gradient-primary)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-32 -right-32 h-80 w-80 rounded-full opacity-20 blur-3xl"
+        style={{ background: "var(--gradient-primary)" }}
+      />
+
+      <div className="relative w-full max-w-md">
         <div className="flex flex-col items-center gap-3 mb-6">
           <AppLogo size="lg" />
           <div className="text-center">
-            <h1 className="text-2xl font-bold">BIT KMC Question Bank</h1>
+            <h1 className="text-2xl font-bold tracking-tight">BIT KMC Question Bank</h1>
             <p className="text-xs text-muted-foreground mt-1">Kailali Multiple Campus · BIT Program</p>
+            <div className="mt-3 flex items-center justify-center gap-3 text-[11px] text-muted-foreground">
+              <span className="inline-flex items-center gap-1"><BookOpen className="h-3 w-3 text-primary" />Past papers</span>
+              <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+              <span className="inline-flex items-center gap-1"><Sparkles className="h-3 w-3 text-primary" />Notes</span>
+              <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+              <span className="inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3 text-primary" />Secure</span>
+            </div>
           </div>
         </div>
 
-        <Card className="p-6" style={{ boxShadow: "var(--shadow-elegant)" }}>
+        <Card className="p-6 border-border/60 backdrop-blur-sm bg-card/95" style={{ boxShadow: "var(--shadow-elegant)" }}>
           <Tabs defaultValue="signin">
             <TabsList className="grid grid-cols-2 w-full mb-4">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -126,15 +145,25 @@ function LoginPage() {
               <form onSubmit={onSignUp} className="space-y-3">
                 <div>
                   <Label htmlFor="su-name">Full name</Label>
-                  <Input id="su-name" required value={name} onChange={(e) => setName(e.target.value)} />
+                  <div className="relative mt-1">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input id="su-name" required value={name} onChange={(e) => setName(e.target.value)} className="pl-9" />
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="su-email">Email</Label>
-                  <Input id="su-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <div className="relative mt-1">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input id="su-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="pl-9" />
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="su-pass">Password</Label>
-                  <Input id="su-pass" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <div className="relative mt-1">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input id="su-pass" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="pl-9" />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-1">At least 6 characters</p>
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
@@ -150,14 +179,18 @@ function LoginPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" onClick={() => oauth("google")} type="button">
+            <Button variant="outline" onClick={() => oauth("google")} type="button" className="hover:bg-accent">
               <GoogleIcon /><span className="ml-2">Google</span>
             </Button>
-            <Button variant="outline" onClick={() => oauth("github")} type="button">
+            <Button variant="outline" onClick={() => oauth("github")} type="button" className="hover:bg-accent">
               <GitHubIcon /><span className="ml-2">GitHub</span>
             </Button>
           </div>
         </Card>
+
+        <p className="mt-6 text-center text-[11px] text-muted-foreground">
+          By continuing, you agree to use this platform for academic purposes.
+        </p>
       </div>
     </div>
   );
