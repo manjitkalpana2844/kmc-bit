@@ -5,7 +5,6 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { MotionProvider } from "@/hooks/use-motion";
 import { Toaster } from "@/components/ui/sonner";
-import { SplashGate } from "@/components/SplashGate";
 
 function NotFoundComponent() {
   return (
@@ -73,9 +72,7 @@ function RootComponent() {
     <ThemeProvider>
       <MotionProvider>
         <AuthProvider>
-          <SplashGate>
-            <Outlet />
-          </SplashGate>
+          <Outlet />
           <Toaster richColors position="top-center" />
         </AuthProvider>
       </MotionProvider>
