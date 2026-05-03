@@ -32,7 +32,7 @@ interface AccessRow {
 }
 
 export function AdminUsers() {
-  const { user: me } = useAuth();
+  const { user: me, isAdmin, loading: authLoading } = useAuth();
   const [rows, setRows] = useState<UserRow[]>([]);
   const [accessByUser, setAccessByUser] = useState<Record<string, AccessRow[]>>({});
   const [search, setSearch] = useState("");
@@ -55,15 +55,21 @@ export function AdminUsers() {
     });
     setAccessByUser(map);
 
-    try {
-      const res = await listUnconfirmedUsers();
-      setUnconfirmed(new Set(res.unconfirmed.map((u) => u.id)));
-    } catch (e: any) {
-      // non-fatal; just hide unconfirmed badges
-      console.warn("listUnconfirmedUsers failed", e);
+    if (isAdmin) {
+      try {
+        const res = await listUnconfirmedUsers();
+        setUnconfirmed(new Set(res.unconfirmed.map((u) => u.id)));
+      } catch (e) {
+        // non-fatal; just hide unconfirmed badges
+        const msg = e instanceof Response ? `${e.status} ${e.statusText}` : String(e);
+        console.warn("listUnconfirmedUsers failed:", msg);
+      }
     }
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (authLoading || !me) return;
+    load();
+  }, [authLoading, me?.id, isAdmin]);
 
   const toggleAdmin = async (u: UserRow) => {
     if (u.isAdmin) {
