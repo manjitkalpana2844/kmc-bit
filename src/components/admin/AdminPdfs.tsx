@@ -49,7 +49,7 @@ export function AdminPdfs() {
   const saveEdit = async (r: Row) => {
     const subjects = SEMESTER_SUBJECTS[draft.semester ?? r.semester] ?? [];
     const subject = subjects.includes(draft.subject ?? "") ? draft.subject : subjects[0] ?? r.subject;
-    const payload = {
+    const payload: any = {
       title: (draft.title ?? r.title).trim() || r.title,
       semester: draft.semester ?? r.semester,
       subject: subject ?? r.subject,
