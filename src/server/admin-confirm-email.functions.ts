@@ -69,7 +69,7 @@ export const resendVerificationEmail = createServerFn({ method: "POST" })
     if (error) {
       // fallback: generate link (still counts as a delivery attempt depending on SMTP config)
       const { error: lErr } = await supabaseAdmin.auth.admin.generateLink({
-        type: "signup",
+        type: "magiclink",
         email: got.user.email,
       });
       if (lErr) throw new Response(lErr.message, { status: 500 });
