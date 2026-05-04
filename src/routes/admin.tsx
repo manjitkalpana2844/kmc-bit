@@ -3,12 +3,13 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { AppHeader } from "@/components/AppHeader";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Shield, Upload, FileText, Bell, Users, Receipt, BarChart3, MessageSquare, TrendingUp, GraduationCap, Sliders, ToggleRight } from "lucide-react";
+import { Shield, Upload, FileText, Bell, Users, Receipt, BarChart3, MessageSquare, TrendingUp, GraduationCap, Sliders, ToggleRight, Crown } from "lucide-react";
 import { AdminUpload } from "@/components/admin/AdminUpload";
 import { AdminPdfs } from "@/components/admin/AdminPdfs";
 import { AdminNotifications } from "@/components/admin/AdminNotifications";
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminPaymentRequests } from "@/components/admin/AdminPaymentRequests";
+import { AdminSubscribers } from "@/components/admin/AdminSubscribers";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminFeedback } from "@/components/admin/AdminFeedback";
 import { AdminRevenue } from "@/components/admin/AdminRevenue";
@@ -61,6 +62,7 @@ function AdminPage() {
             <TabsTrigger value="notifications"><Bell className="h-4 w-4 mr-1" />Notify</TabsTrigger>
             <TabsTrigger value="users"><Users className="h-4 w-4 mr-1" />Users</TabsTrigger>
             <TabsTrigger value="payments"><Receipt className="h-4 w-4 mr-1" />Payments</TabsTrigger>
+            <TabsTrigger value="subscribers"><Crown className="h-4 w-4 mr-1" />Subscribers</TabsTrigger>
             <TabsTrigger value="revenue"><TrendingUp className="h-4 w-4 mr-1" />Revenue</TabsTrigger>
             <TabsTrigger value="feedback"><MessageSquare className="h-4 w-4 mr-1" />Feedback</TabsTrigger>
             <TabsTrigger value="features"><ToggleRight className="h-4 w-4 mr-1" />Features</TabsTrigger>
@@ -73,6 +75,7 @@ function AdminPage() {
           <TabsContent value="notifications" className="mt-6"><AdminNotifications /></TabsContent>
           <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
           <TabsContent value="payments" className="mt-6"><AdminPaymentRequests /></TabsContent>
+          <TabsContent value="subscribers" className="mt-6"><AdminSubscribers /></TabsContent>
           <TabsContent value="revenue" className="mt-6"><AdminRevenue /></TabsContent>
           <TabsContent value="feedback" className="mt-6"><AdminFeedback /></TabsContent>
           <TabsContent value="features" className="mt-6"><AdminFeatures /></TabsContent>
