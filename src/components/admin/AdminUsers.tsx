@@ -3,10 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download, MailCheck, Send } from "lucide-react";
+import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download, MailCheck, Send, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
@@ -232,6 +233,7 @@ export function AdminUsers() {
                 </Button>
               )}
               <AccessDialog user={u} access={userAccess} onChange={load} />
+              <QuickUnlock user={u} access={userAccess} onChange={load} />
               {u.id !== me?.id && (
                 <Button variant="outline" size="sm" onClick={() => toggleAdmin(u)}>
                   {u.isAdmin ? <><ShieldOff className="h-4 w-4 mr-1" />Demote</> : <><Shield className="h-4 w-4 mr-1" />Promote</>}
