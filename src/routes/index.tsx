@@ -244,7 +244,7 @@ function Index() {
               </div>
               <p className="opacity-90 text-sm sm:text-base mt-1 flex items-center gap-1.5">
                 <GraduationCap className="h-4 w-4" />
-                BIT — Kailali Multiple Campus
+                BIT — Far Western University
               </p>
               <p className="opacity-75 text-xs mt-0.5 truncate">{profile?.email ?? user.email}</p>
             </div>

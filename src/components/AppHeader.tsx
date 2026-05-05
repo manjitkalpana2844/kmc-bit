@@ -33,8 +33,8 @@ export function AppHeader() {
         <Link to="/" className="flex items-center gap-3 min-w-0">
           <AppLogo size="sm" />
           <div className="hidden sm:block min-w-0">
-            <div className="font-bold text-sm leading-tight truncate">BIT KMC Question Bank</div>
-            <div className="text-[10px] text-muted-foreground truncate">Kailali Multiple Campus</div>
+            <div className="font-bold text-sm leading-tight truncate">FWU BIT</div>
+            <div className="text-[10px] text-muted-foreground truncate">Far Western University</div>
           </div>
         </Link>
 

@@ -54,7 +54,7 @@ function AdminLoginPage() {
               <Shield className="h-7 w-7 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-bold">Admin Login</h1>
-            <p className="text-xs text-muted-foreground mt-1">Restricted access · BIT KMC</p>
+            <p className="text-xs text-muted-foreground mt-1">Restricted access · FWU BIT</p>
           </div>
           <form onSubmit={submit} className="space-y-3">
             <div>
