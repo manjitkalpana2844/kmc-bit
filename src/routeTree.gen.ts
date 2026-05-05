@@ -16,11 +16,13 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as GetAccessRouteImport } from './routes/get-access'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as BooksRouteImport } from './routes/books'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SemesterSemRouteImport } from './routes/semester.$sem'
 import { Route as PdfPdfIdRouteImport } from './routes/pdf.$pdfId'
+import { Route as BooksBookIdRouteImport } from './routes/books.$bookId'
 import { Route as SubjectSemSubjectRouteImport } from './routes/subject.$sem.$subject'
 import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api/public/bootstrap-admin'
 
@@ -59,6 +61,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BooksRoute = BooksRouteImport.update({
+  id: '/books',
+  path: '/books',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin-login',
   path: '/admin-login',
@@ -84,6 +91,11 @@ const PdfPdfIdRoute = PdfPdfIdRouteImport.update({
   path: '/pdf/$pdfId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BooksBookIdRoute = BooksBookIdRouteImport.update({
+  id: '/$bookId',
+  path: '/$bookId',
+  getParentRoute: () => BooksRoute,
+} as any)
 const SubjectSemSubjectRoute = SubjectSemSubjectRouteImport.update({
   id: '/subject/$sem/$subject',
   path: '/subject/$sem/$subject',
@@ -99,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/books': typeof BooksRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
   '/library': typeof LibraryRoute
@@ -106,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/books/$bookId': typeof BooksBookIdRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
@@ -115,6 +129,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/books': typeof BooksRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
   '/library': typeof LibraryRoute
@@ -122,6 +137,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/books/$bookId': typeof BooksBookIdRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
@@ -132,6 +148,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
+  '/books': typeof BooksRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/get-access': typeof GetAccessRoute
   '/library': typeof LibraryRoute
@@ -139,6 +156,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/books/$bookId': typeof BooksBookIdRoute
   '/pdf/$pdfId': typeof PdfPdfIdRoute
   '/semester/$sem': typeof SemesterSemRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
@@ -150,6 +168,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/books'
     | '/feedback'
     | '/get-access'
     | '/library'
@@ -157,6 +176,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/search'
+    | '/books/$bookId'
     | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/api/public/bootstrap-admin'
@@ -166,6 +186,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/books'
     | '/feedback'
     | '/get-access'
     | '/library'
@@ -173,6 +194,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/search'
+    | '/books/$bookId'
     | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/api/public/bootstrap-admin'
@@ -182,6 +204,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-login'
+    | '/books'
     | '/feedback'
     | '/get-access'
     | '/library'
@@ -189,6 +212,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/search'
+    | '/books/$bookId'
     | '/pdf/$pdfId'
     | '/semester/$sem'
     | '/api/public/bootstrap-admin'
@@ -199,6 +223,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  BooksRoute: typeof BooksRouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
   GetAccessRoute: typeof GetAccessRoute
   LibraryRoute: typeof LibraryRoute
@@ -263,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/books': {
+      id: '/books'
+      path: '/books'
+      fullPath: '/books'
+      preLoaderRoute: typeof BooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin-login': {
       id: '/admin-login'
       path: '/admin-login'
@@ -298,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PdfPdfIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/books/$bookId': {
+      id: '/books/$bookId'
+      path: '/$bookId'
+      fullPath: '/books/$bookId'
+      preLoaderRoute: typeof BooksBookIdRouteImport
+      parentRoute: typeof BooksRoute
+    }
     '/subject/$sem/$subject': {
       id: '/subject/$sem/$subject'
       path: '/subject/$sem/$subject'
@@ -315,10 +354,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface BooksRouteChildren {
+  BooksBookIdRoute: typeof BooksBookIdRoute
+}
+
+const BooksRouteChildren: BooksRouteChildren = {
+  BooksBookIdRoute: BooksBookIdRoute,
+}
+
+const BooksRouteWithChildren = BooksRoute._addFileChildren(BooksRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AdminLoginRoute: AdminLoginRoute,
+  BooksRoute: BooksRouteWithChildren,
   FeedbackRoute: FeedbackRoute,
   GetAccessRoute: GetAccessRoute,
   LibraryRoute: LibraryRoute,
@@ -334,3 +384,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
