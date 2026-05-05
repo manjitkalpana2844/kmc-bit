@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Save, Upload, BadgeCheck, Clock, BookMarked, Library, MessageSquare, Sparkles } from "lucide-react";
+import { ArrowLeft, Save, Upload, BadgeCheck, Clock, BookMarked, Library, MessageSquare, Sparkles, Crown, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { daysLeft } from "@/lib/tracking";
 import { useMotion } from "@/hooks/use-motion";
@@ -23,10 +23,15 @@ function ProfilePage() {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
+  const [plans, setPlans] = useState<any[]>([]);
   const { pref, setPref, reduced } = useMotion();
 
   useEffect(() => { if (!loading && !user) navigate({ to: "/login" }); }, [loading, user]);
   useEffect(() => { setName(profile?.name ?? ""); }, [profile?.name]);
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("user_access").select("*").eq("user_id", user.id).eq("is_active", true).order("granted_at", { ascending: false }).then(({ data }) => setPlans(data ?? []));
+  }, [user?.id]);
 
   const save = async () => {
     if (!user) return;
@@ -120,6 +125,38 @@ function ProfilePage() {
             </div>
           </Card>
         )}
+
+        <Card className="p-5 mb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <Crown className="h-5 w-5 text-primary" />
+            <div className="flex-1">
+              <div className="font-semibold text-sm">My subscriptions</div>
+              <div className="text-xs text-muted-foreground">Plans you've purchased</div>
+            </div>
+            <Button asChild size="sm" variant="outline"><Link to="/get-access">Buy more</Link></Button>
+          </div>
+          {plans.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No active subscriptions yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {plans.map((p) => (
+                <div key={p.id} className="flex items-center gap-2 p-2 border rounded-md text-sm">
+                  <BookOpen className="h-4 w-4 text-primary" />
+                  <div className="flex-1">
+                    <div className="font-medium">
+                      {p.access_type === "monthly_all_access" ? "Monthly All Access" : `Semester ${p.semester} Pass`}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      Granted {new Date(p.granted_at).toLocaleDateString()}
+                      {p.expires_at && <> · Expires {new Date(p.expires_at).toLocaleDateString()}</>}
+                    </div>
+                  </div>
+                  <Badge variant="secondary">Active</Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
 
         {/* Motion preferences */}
         <Card className="p-5 mb-6">
