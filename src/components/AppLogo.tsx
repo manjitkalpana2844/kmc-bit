@@ -48,7 +48,7 @@ export function AppLogo({ onLongPress, size = "md" }: Props) {
       onContextMenu={(e) => e.preventDefault()}
       className={`${sizes[size]} rounded-2xl flex items-center justify-center select-none cursor-pointer transition-all ${holding ? "scale-110 ring-4 ring-primary/40" : "active:scale-95"}`}
       style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)", touchAction: "none" }}
-      aria-label="BIT KMC logo"
+      aria-label="FWU BIT logo"
     >
       <GraduationCap className="text-primary-foreground" />
     </button>
