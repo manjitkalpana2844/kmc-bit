@@ -536,10 +536,13 @@ function Index() {
                 )}
                 <div className="flex items-start justify-between mb-3">
                   <div
-                    className="h-10 w-10 rounded-xl flex items-center justify-center text-primary-foreground font-bold text-sm"
+                    className="h-10 w-10 rounded-xl flex items-center justify-center text-primary-foreground font-bold text-sm relative"
                     style={{ background: isLocked ? "var(--muted)" : "var(--gradient-primary)" }}
                   >
-                    {sem}
+                    <BookMarked className="h-5 w-5" />
+                    <span className="absolute -bottom-1 -right-1 text-[10px] bg-background text-foreground rounded-full h-4 w-4 flex items-center justify-center border">
+                      {sem}
+                    </span>
                   </div>
                   {isLocked ? (
                     <Lock className="h-4 w-4 text-muted-foreground" />
