@@ -33,8 +33,8 @@ export function AppHeader() {
         <Link to="/" className="flex items-center gap-3 min-w-0">
           <AppLogo size="sm" />
           <div className="hidden sm:block min-w-0">
-            <div className="font-bold text-sm leading-tight truncate">BIT KMC Question Bank</div>
-            <div className="text-[10px] text-muted-foreground truncate">Kailali Multiple Campus</div>
+            <div className="font-bold text-sm leading-tight truncate">FWU BIT</div>
+            <div className="text-[10px] text-muted-foreground truncate">Far Western University</div>
           </div>
         </Link>
 
@@ -98,6 +98,9 @@ export function AppHeader() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/library"><Library className="h-4 w-4 mr-2" />My Library</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/books"><BookOpen className="h-4 w-4 mr-2" />Reference Books</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/profile"><UserCog className="h-4 w-4 mr-2" />Profile</Link>

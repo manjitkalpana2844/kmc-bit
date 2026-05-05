@@ -18,12 +18,12 @@ interface Branding {
 }
 
 const DEFAULT: Branding = {
-  campus_name: "BIT KMC Question Bank",
-  campus_subtitle: "Kailali Multiple Campus",
+  campus_name: "FWU BIT",
+  campus_subtitle: "Far Western University",
   logo_url: "",
   contact_email: "",
   contact_phone: "",
-  footer_text: "Made for BIT students of Kailali Multiple Campus",
+  footer_text: "Made for BIT students of Far Western University",
 };
 
 export function AdminSettings() {

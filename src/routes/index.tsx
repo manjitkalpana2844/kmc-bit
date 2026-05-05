@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Lock, Search, BookOpen, Crown, Clock, FileText, ChevronRight, GraduationCap, Sparkles } from "lucide-react";
+import { Lock, Search, BookOpen, Crown, Clock, FileText, ChevronRight, GraduationCap, Sparkles, Library, BookMarked, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
@@ -244,7 +244,7 @@ function Index() {
               </div>
               <p className="opacity-90 text-sm sm:text-base mt-1 flex items-center gap-1.5">
                 <GraduationCap className="h-4 w-4" />
-                BIT — Kailali Multiple Campus
+                BIT — Far Western University
               </p>
               <p className="opacity-75 text-xs mt-0.5 truncate">{profile?.email ?? user.email}</p>
             </div>
@@ -270,6 +270,40 @@ function Index() {
         </div>
 
         <div className="mb-6"><StreakBadge /></div>
+
+        {/* About Far Western University */}
+        <Card className="p-5 mb-6 border-primary/20">
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--gradient-primary)" }}>
+              <GraduationCap className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-semibold text-base">About Far Western University (FWU)</h2>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Far Western University, established in 2010, is a public university based in Mahendranagar, Kanchanpur, Nepal. It serves the Far-Western region with a wide range of undergraduate and graduate programs, including the Bachelor of Information Technology (BIT) — focused on building strong IT professionals through a modern, industry-aligned curriculum.
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Quick links */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+          <Link to="/books"><Card className="p-4 hover:shadow-md transition cursor-pointer h-full">
+            <Library className="h-5 w-5 text-primary mb-2" />
+            <div className="font-semibold text-sm">Reference Books</div>
+            <div className="text-xs text-muted-foreground">Read curated books online</div>
+          </Card></Link>
+          <Link to="/library"><Card className="p-4 hover:shadow-md transition cursor-pointer h-full">
+            <BookMarked className="h-5 w-5 text-primary mb-2" />
+            <div className="font-semibold text-sm">My Library</div>
+            <div className="text-xs text-muted-foreground">Bookmarks & downloads</div>
+          </Card></Link>
+          <Link to="/get-access"><Card className="p-4 hover:shadow-md transition cursor-pointer h-full">
+            <Crown className="h-5 w-5 text-primary mb-2" />
+            <div className="font-semibold text-sm">Plans</div>
+            <div className="text-xs text-muted-foreground">Buy or upgrade access</div>
+          </Card></Link>
+        </div>
 
         {/* Search */}
         <div className="relative mb-6 max-w-xl">
@@ -485,6 +519,18 @@ function Index() {
             </Button>
           </Card>
         )}
+        {hasActiveAccess && (
+          <Card className="p-4 mb-4 flex flex-wrap items-center gap-3 border-primary/30">
+            <Plus className="h-5 w-5 text-primary" />
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-sm">Get more access</div>
+              <div className="text-xs text-muted-foreground">Buy passes for additional semesters or upgrade your plan.</div>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/get-access">Buy more</Link>
+            </Button>
+          </Card>
+        )}
         {hasActiveAccess && accessExpiresAt && (() => {
           const left = daysLeft(accessExpiresAt);
           if (left === null || left > 7) return null;
@@ -524,10 +570,13 @@ function Index() {
                 )}
                 <div className="flex items-start justify-between mb-3">
                   <div
-                    className="h-10 w-10 rounded-xl flex items-center justify-center text-primary-foreground font-bold text-sm"
+                    className="h-10 w-10 rounded-xl flex items-center justify-center text-primary-foreground font-bold text-sm relative"
                     style={{ background: isLocked ? "var(--muted)" : "var(--gradient-primary)" }}
                   >
-                    {sem}
+                    <BookMarked className="h-5 w-5" />
+                    <span className="absolute -bottom-1 -right-1 text-[10px] bg-background text-foreground rounded-full h-4 w-4 flex items-center justify-center border">
+                      {sem}
+                    </span>
                   </div>
                   {isLocked ? (
                     <Lock className="h-4 w-4 text-muted-foreground" />

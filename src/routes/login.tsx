@@ -100,8 +100,8 @@ function LoginPage() {
         <div className="flex flex-col items-center gap-3 mb-6">
           <AppLogo size="lg" />
           <div className="text-center">
-            <h1 className="text-2xl font-bold tracking-tight">BIT KMC Question Bank</h1>
-            <p className="text-xs text-muted-foreground mt-1">Kailali Multiple Campus · BIT Program</p>
+            <h1 className="text-2xl font-bold tracking-tight">FWU BIT</h1>
+            <p className="text-xs text-muted-foreground mt-1">Far Western University · BIT Program</p>
             <div className="mt-3 flex items-center justify-center gap-3 text-[11px] text-muted-foreground">
               <span className="inline-flex items-center gap-1"><BookOpen className="h-3 w-3 text-primary" />Past papers</span>
               <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
