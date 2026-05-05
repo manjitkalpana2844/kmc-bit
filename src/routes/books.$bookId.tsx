@@ -25,7 +25,7 @@ function BookReader() {
       const { data, error: e } = await supabase.from("books").select("*").eq("id", bookId).maybeSingle();
       if (e || !data) { setError("Book not found."); return; }
       setBook(data);
-      const { data: s } = await supabase.storage.from("pdfs").createSignedUrl(data.file_path, 3600);
+      const { data: s } = await supabase.storage.from("books").createSignedUrl(data.file_path, 3600);
       setSignedUrl(s?.signedUrl ?? null);
     })();
   }, [bookId]);
