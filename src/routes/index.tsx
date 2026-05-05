@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Lock, Search, BookOpen, Crown, Clock, FileText, ChevronRight, GraduationCap, Sparkles } from "lucide-react";
+import { Lock, Search, BookOpen, Crown, Clock, FileText, ChevronRight, GraduationCap, Sparkles, Library, BookMarked, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
