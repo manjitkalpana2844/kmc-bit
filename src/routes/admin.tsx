@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { AppHeader } from "@/components/AppHeader";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Shield, Upload, FileText, Bell, Users, Receipt, BarChart3, MessageSquare, TrendingUp, GraduationCap, Sliders, ToggleRight, Crown } from "lucide-react";
+import { Shield, Upload, FileText, Bell, Users, Receipt, BarChart3, MessageSquare, TrendingUp, GraduationCap, Sliders, ToggleRight, Crown, Library } from "lucide-react";
 import { AdminUpload } from "@/components/admin/AdminUpload";
 import { AdminPdfs } from "@/components/admin/AdminPdfs";
 import { AdminNotifications } from "@/components/admin/AdminNotifications";
@@ -16,6 +16,7 @@ import { AdminRevenue } from "@/components/admin/AdminRevenue";
 import { AdminSemesters } from "@/components/admin/AdminSemesters";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { AdminFeatures } from "@/components/admin/AdminFeatures";
+import { AdminBooks } from "@/components/admin/AdminBooks";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin")({
@@ -58,6 +59,7 @@ function AdminPage() {
             <TabsTrigger value="stats"><BarChart3 className="h-4 w-4 mr-1" />Stats</TabsTrigger>
             <TabsTrigger value="upload"><Upload className="h-4 w-4 mr-1" />Upload</TabsTrigger>
             <TabsTrigger value="pdfs"><FileText className="h-4 w-4 mr-1" />PDFs</TabsTrigger>
+            <TabsTrigger value="books"><Library className="h-4 w-4 mr-1" />Books</TabsTrigger>
             <TabsTrigger value="semesters"><GraduationCap className="h-4 w-4 mr-1" />Semesters</TabsTrigger>
             <TabsTrigger value="notifications"><Bell className="h-4 w-4 mr-1" />Notify</TabsTrigger>
             <TabsTrigger value="users"><Users className="h-4 w-4 mr-1" />Users</TabsTrigger>
@@ -71,6 +73,7 @@ function AdminPage() {
           <TabsContent value="stats" className="mt-6"><AdminStats /></TabsContent>
           <TabsContent value="upload" className="mt-6"><AdminUpload /></TabsContent>
           <TabsContent value="pdfs" className="mt-6"><AdminPdfs /></TabsContent>
+          <TabsContent value="books" className="mt-6"><AdminBooks /></TabsContent>
           <TabsContent value="semesters" className="mt-6"><AdminSemesters /></TabsContent>
           <TabsContent value="notifications" className="mt-6"><AdminNotifications /></TabsContent>
           <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
