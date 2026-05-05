@@ -3,10 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download, MailCheck, Send } from "lucide-react";
+import { Shield, ShieldOff, Users, KeyRound, Lock, Unlock, Trash2, BadgeCheck, Search, Download, MailCheck, Send, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
@@ -232,6 +233,7 @@ export function AdminUsers() {
                 </Button>
               )}
               <AccessDialog user={u} access={userAccess} onChange={load} />
+              <QuickUnlock user={u} access={userAccess} onChange={load} />
               {u.id !== me?.id && (
                 <Button variant="outline" size="sm" onClick={() => toggleAdmin(u)}>
                   {u.isAdmin ? <><ShieldOff className="h-4 w-4 mr-1" />Demote</> : <><Shield className="h-4 w-4 mr-1" />Promote</>}
@@ -340,5 +342,62 @@ function AccessDialog({ user, access, onChange }: { user: UserRow; access: Acces
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function QuickUnlock({ user, access, onChange }: { user: UserRow; access: AccessRow[]; onChange: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState<number | null>(null);
+
+  const activeSemesters = new Set(
+    access.filter((a) => a.is_active && a.access_type === "semester_pass" && a.semester).map((a) => a.semester as number)
+  );
+  const hasMonthly = access.some((a) => a.is_active && a.access_type === "monthly_all_access");
+
+  const unlock = async (sem: number) => {
+    setBusy(sem);
+    const { error } = await supabase.from("user_access").insert({
+      user_id: user.id,
+      access_type: "semester_pass",
+      semester: sem,
+      is_active: true,
+    });
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    toast.success(`${SEMESTER_ORDINAL(sem)} semester unlocked for ${user.name ?? user.email}`);
+    onChange();
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" title="Quick unlock semester">
+          <Zap className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-2" align="end">
+        <div className="text-xs font-medium px-2 py-1 text-muted-foreground">
+          {hasMonthly ? "User has Monthly All Access" : "Unlock semester"}
+        </div>
+        <div className="grid grid-cols-2 gap-1 mt-1">
+          {Array.from({ length: 8 }, (_, i) => i + 1).map((sem) => {
+            const already = activeSemesters.has(sem);
+            return (
+              <Button
+                key={sem}
+                variant={already ? "secondary" : "outline"}
+                size="sm"
+                className="justify-start text-xs"
+                disabled={already || busy !== null}
+                onClick={() => unlock(sem)}
+              >
+                {already ? <Unlock className="h-3 w-3 mr-1" /> : <Lock className="h-3 w-3 mr-1" />}
+                {SEMESTER_ORDINAL(sem)}
+              </Button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
