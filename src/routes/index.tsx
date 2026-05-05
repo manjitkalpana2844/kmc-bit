@@ -271,6 +271,40 @@ function Index() {
 
         <div className="mb-6"><StreakBadge /></div>
 
+        {/* About Far Western University */}
+        <Card className="p-5 mb-6 border-primary/20">
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--gradient-primary)" }}>
+              <GraduationCap className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-semibold text-base">About Far Western University (FWU)</h2>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Far Western University, established in 2010, is a public university based in Mahendranagar, Kanchanpur, Nepal. It serves the Far-Western region with a wide range of undergraduate and graduate programs, including the Bachelor of Information Technology (BIT) — focused on building strong IT professionals through a modern, industry-aligned curriculum.
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Quick links */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+          <Link to="/books"><Card className="p-4 hover:shadow-md transition cursor-pointer h-full">
+            <Library className="h-5 w-5 text-primary mb-2" />
+            <div className="font-semibold text-sm">Reference Books</div>
+            <div className="text-xs text-muted-foreground">Read curated books online</div>
+          </Card></Link>
+          <Link to="/library"><Card className="p-4 hover:shadow-md transition cursor-pointer h-full">
+            <BookMarked className="h-5 w-5 text-primary mb-2" />
+            <div className="font-semibold text-sm">My Library</div>
+            <div className="text-xs text-muted-foreground">Bookmarks & downloads</div>
+          </Card></Link>
+          <Link to="/get-access"><Card className="p-4 hover:shadow-md transition cursor-pointer h-full">
+            <Crown className="h-5 w-5 text-primary mb-2" />
+            <div className="font-semibold text-sm">Plans</div>
+            <div className="text-xs text-muted-foreground">Buy or upgrade access</div>
+          </Card></Link>
+        </div>
+
         {/* Search */}
         <div className="relative mb-6 max-w-xl">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
