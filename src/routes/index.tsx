@@ -485,6 +485,18 @@ function Index() {
             </Button>
           </Card>
         )}
+        {hasActiveAccess && (
+          <Card className="p-4 mb-4 flex flex-wrap items-center gap-3 border-primary/30">
+            <Plus className="h-5 w-5 text-primary" />
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-sm">Get more access</div>
+              <div className="text-xs text-muted-foreground">Buy passes for additional semesters or upgrade your plan.</div>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/get-access">Buy more</Link>
+            </Button>
+          </Card>
+        )}
         {hasActiveAccess && accessExpiresAt && (() => {
           const left = daysLeft(accessExpiresAt);
           if (left === null || left > 7) return null;
