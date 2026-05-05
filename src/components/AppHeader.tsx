@@ -100,6 +100,9 @@ export function AppHeader() {
                   <Link to="/library"><Library className="h-4 w-4 mr-2" />My Library</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/books"><BookOpen className="h-4 w-4 mr-2" />Reference Books</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/profile"><UserCog className="h-4 w-4 mr-2" />Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
