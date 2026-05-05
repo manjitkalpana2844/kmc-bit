@@ -37,7 +37,7 @@ export function AdminBooks() {
 
   const remove = async (b: Book) => {
     if (!confirm(`Delete book "${b.title}"?`)) return;
-    await supabase.storage.from("pdfs").remove([b.file_path]);
+    await supabase.storage.from("books").remove([b.file_path]);
     const { error } = await supabase.from("books").delete().eq("id", b.id);
     if (error) return toast.error(error.message);
     toast.success("Book deleted");
@@ -100,19 +100,19 @@ function BookEditor({ book, onSaved }: { book?: Book; onSaved: () => void }) {
       let file_path = book?.file_path;
       if (pdfFile) {
         const safe = pdfFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `books/${Date.now()}-${safe}`;
-        const up = await supabase.storage.from("pdfs").upload(path, pdfFile, { contentType: "application/pdf", upsert: false });
+        const path = `pdfs/${Date.now()}-${safe}`;
+        const up = await supabase.storage.from("books").upload(path, pdfFile, { contentType: "application/pdf", upsert: false });
         if (up.error) throw up.error;
         file_path = path;
       }
       let cover_url = book?.cover_url ?? null;
       if (coverFile) {
         const safe = coverFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `book-covers/${Date.now()}-${safe}`;
-        const up = await supabase.storage.from("avatars").upload(path, coverFile, { contentType: coverFile.type, upsert: true });
+        const path = `covers/${Date.now()}-${safe}`;
+        const up = await supabase.storage.from("books").upload(path, coverFile, { contentType: coverFile.type, upsert: true });
         if (up.error) throw up.error;
-        const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-        cover_url = `${data.publicUrl}?v=${Date.now()}`;
+        const { data: signed } = await supabase.storage.from("books").createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
+        cover_url = signed?.signedUrl ?? null;
       }
       const payload: any = {
         title: title.trim(),
