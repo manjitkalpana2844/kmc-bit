@@ -11,9 +11,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
+import { useSemesterCount } from "@/hooks/use-semester-count";
 import { Input } from "@/components/ui/input";
 import { downloadCsv } from "@/lib/csv";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { confirmUserEmails, listUnconfirmedUsers, resendVerificationEmail } from "@/server/admin-confirm-email.functions";
 
 interface UserRow {
@@ -34,6 +36,7 @@ interface AccessRow {
 
 export function AdminUsers() {
   const { user: me, isAdmin, loading: authLoading } = useAuth();
+  const semesterCount = useSemesterCount();
   const [rows, setRows] = useState<UserRow[]>([]);
   const [accessByUser, setAccessByUser] = useState<Record<string, AccessRow[]>>({});
   const [search, setSearch] = useState("");
@@ -133,6 +136,66 @@ export function AdminUsers() {
   const confirmFiltered = () => confirmIds(filtered.filter((u) => unconfirmed.has(u.id)).map((u) => u.id), "Filtered unconfirmed");
 
   return (
+    <Tabs defaultValue="directory" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="directory">Directory</TabsTrigger>
+        <TabsTrigger value="actions">Actions</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="directory">
+        <Card className="p-6">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <h2 className="font-semibold text-lg flex items-center gap-2">
+              <Users className="h-5 w-5" />Users ({filtered.length}/{rows.length})
+            </h2>
+            <div className="flex-1" />
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or email" className="pl-9" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            {filtered.length === 0 && <p className="text-sm text-muted-foreground">No users yet</p>}
+            {filtered.map((u) => {
+              const initials = (u.name ?? u.email ?? "U").slice(0, 2).toUpperCase();
+              const userAccess = accessByUser[u.id] ?? [];
+              const activeAccess = userAccess.filter((a) => a.is_active);
+              const isVerified = activeAccess.length > 0;
+              return (
+                <div key={u.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={u.avatar_url ?? undefined} />
+                    <AvatarFallback>{initials}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate flex items-center gap-1">
+                      <span className="truncate">{u.name ?? "Unnamed"}</span>
+                      {isVerified && <BadgeCheck className="h-4 w-4 text-primary shrink-0" aria-label="Verified" />}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">{u.email}</div>
+                    {activeAccess.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {activeAccess.map((a) => (
+                          <Badge key={a.id} variant="secondary" className="text-[10px]">
+                            {a.access_type === "monthly_all_access"
+                              ? "Monthly All Access"
+                              : `Sem ${a.semester} Pass`}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${u.isAdmin ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                    {u.isAdmin ? "Admin" : "Student"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="actions">
     <Card className="p-6">
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <h2 className="font-semibold text-lg flex items-center gap-2"><Users className="h-5 w-5" />Users ({filtered.length}/{rows.length})</h2>
@@ -244,6 +307,8 @@ export function AdminUsers() {
         })}
       </div>
     </Card>
+      </TabsContent>
+    </Tabs>
   );
 }
 
@@ -346,6 +411,7 @@ function AccessDialog({ user, access, onChange }: { user: UserRow; access: Acces
 }
 
 function QuickUnlock({ user, access, onChange }: { user: UserRow; access: AccessRow[]; onChange: () => void }) {
+  const semesterCount = useSemesterCount();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState<number | null>(null);
 
@@ -380,7 +446,7 @@ function QuickUnlock({ user, access, onChange }: { user: UserRow; access: Access
           {hasMonthly ? "User has Monthly All Access" : "Unlock semester"}
         </div>
         <div className="grid grid-cols-2 gap-1 mt-1">
-          {Array.from({ length: 8 }, (_, i) => i + 1).map((sem) => {
+          {Array.from({ length: semesterCount }, (_, i) => i + 1).map((sem) => {
             const already = activeSemesters.has(sem);
             return (
               <Button
