@@ -4,9 +4,9 @@ import { useAuth } from "@/hooks/use-auth";
 
 const items = [
   { to: "/", label: "Home", icon: Home, exact: true },
-  { to: "/books", label: "Books", icon: BookOpen },
-  { to: "/library", label: "Library", icon: Library },
-  { to: "/profile", label: "Profile", icon: UserIcon },
+  { to: "/books", label: "Books", icon: BookOpen, exact: false },
+  { to: "/library", label: "Library", icon: Library, exact: false },
+  { to: "/profile", label: "Profile", icon: UserIcon, exact: false },
 ] as const;
 
 export function MobileBottomNav() {
