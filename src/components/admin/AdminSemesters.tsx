@@ -5,10 +5,12 @@ import { Switch } from "@/components/ui/switch";
 import { Lock, Unlock, GraduationCap, Loader2 } from "lucide-react";
 import { SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { toast } from "sonner";
+import { useSemesterCount } from "@/hooks/use-semester-count";
 
 interface Row { semester: number; is_locked: boolean }
 
 export function AdminSemesters() {
+  const semesterCount = useSemesterCount();
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export function AdminSemesters() {
         Lock a semester to hide its PDFs from all students (admins always retain access).
       </p>
       <div className="grid sm:grid-cols-2 gap-3">
-        {Array.from({ length: 8 }, (_, i) => i + 1).map((sem) => {
+        {Array.from({ length: semesterCount }, (_, i) => i + 1).map((sem) => {
           const row = rows.find((r) => r.semester === sem);
           const locked = row?.is_locked ?? false;
           return (

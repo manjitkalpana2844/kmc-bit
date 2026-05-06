@@ -1,4 +1,5 @@
 import { GraduationCap } from "lucide-react";
+import fwuHero from "@/assets/fwu-hero.jpg";
 
 export function SplashScreen() {
   return (
@@ -7,6 +8,13 @@ export function SplashScreen() {
       role="status"
       aria-label="Loading FWU BIT"
     >
+      <img
+        src={fwuHero}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-cover opacity-20"
+      />
+      <div className="relative flex flex-col items-center">
       <div
         className="h-20 w-20 rounded-3xl flex items-center justify-center animate-in fade-in zoom-in duration-500"
         style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}
@@ -21,6 +29,7 @@ export function SplashScreen() {
         <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
         <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
         <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+      </div>
       </div>
     </div>
   );

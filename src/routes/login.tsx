@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AppLogo } from "@/components/AppLogo";
 import { toast } from "sonner";
+import fwuHero from "@/assets/fwu-hero.jpg";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -99,6 +100,13 @@ function LoginPage() {
       <div className="relative w-full max-w-md">
         <div className="flex flex-col items-center gap-3 mb-6">
           <AppLogo size="lg" />
+          <img
+            src={fwuHero}
+            alt="Far Western University"
+            width={1280}
+            height={640}
+            className="w-full max-w-xs h-28 object-cover rounded-xl border border-border/60 shadow-sm"
+          />
           <div className="text-center">
             <h1 className="text-2xl font-bold tracking-tight">FWU BIT</h1>
             <p className="text-xs text-muted-foreground mt-1">Far Western University · BIT Program</p>

@@ -30,14 +30,35 @@ export function AdminSettings() {
   const [v, setV] = useState<Branding>(DEFAULT);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [totalSemesters, setTotalSemesters] = useState<number>(8);
+  const [semBusy, setSemBusy] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from("app_settings").select("value").eq("key", "branding").maybeSingle();
+      const [{ data }, { data: c }] = await Promise.all([
+        supabase.from("app_settings").select("value").eq("key", "branding").maybeSingle(),
+        supabase.from("app_settings").select("value").eq("key", "curriculum").maybeSingle(),
+      ]);
       if (data?.value) setV({ ...DEFAULT, ...(data.value as Partial<Branding>) });
+      const ts = (c?.value as { total_semesters?: number } | null)?.total_semesters;
+      if (typeof ts === "number" && ts > 0) setTotalSemesters(ts);
       setLoading(false);
     })();
   }, []);
+
+  const saveSemesters = async () => {
+    if (totalSemesters < 1 || totalSemesters > 16) return toast.error("Total semesters must be 1–16");
+    setSemBusy(true);
+    const { error } = await supabase
+      .from("app_settings")
+      .upsert(
+        { key: "curriculum", value: { total_semesters: totalSemesters } as any, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+    setSemBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Total semesters set to ${totalSemesters}`);
+  };
 
   const save = async () => {
     setBusy(true);
@@ -58,6 +79,7 @@ export function AdminSettings() {
   }
 
   return (
+    <div className="space-y-6">
     <Card className="p-6">
       <h2 className="font-semibold text-lg flex items-center gap-2 mb-1">
         <Sliders className="h-5 w-5" /> Site branding & contact
@@ -96,5 +118,31 @@ export function AdminSettings() {
         Save branding
       </Button>
     </Card>
+
+    <Card className="p-6">
+      <h2 className="font-semibold text-lg flex items-center gap-2 mb-1">
+        <Sliders className="h-5 w-5" /> Curriculum
+      </h2>
+      <p className="text-xs text-muted-foreground mb-5">
+        Set the total number of semesters offered by the program. This controls the semester grid on the homepage and admin tools.
+      </p>
+      <div className="flex items-end gap-3 max-w-sm">
+        <div className="flex-1 space-y-1.5">
+          <Label>Total semesters</Label>
+          <Input
+            type="number"
+            min={1}
+            max={16}
+            value={totalSemesters}
+            onChange={(e) => setTotalSemesters(Number(e.target.value))}
+          />
+        </div>
+        <Button onClick={saveSemesters} disabled={semBusy}>
+          {semBusy ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Save className="h-4 w-4 mr-1" />}
+          Save
+        </Button>
+      </div>
+    </Card>
+    </div>
   );
 }

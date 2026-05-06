@@ -14,6 +14,8 @@ import { daysLeft } from "@/lib/tracking";
 import { StreakBadge } from "@/components/StreakBadge";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSemesterCount } from "@/hooks/use-semester-count";
+import fwuHero from "@/assets/fwu-hero.jpg";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { user, profile, loading, hasActiveAccess, accessExpiresAt, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const semesterCount = useSemesterCount();
   const [search, setSearch] = useState("");
   const [locked, setLocked] = useState<Record<number, boolean>>({});
   const [activeIdx, setActiveIdx] = useState(0);
@@ -53,8 +56,8 @@ function Index() {
   }, [user]);
 
   const allSemesters = useMemo(
-    () => Object.keys(SEMESTER_SUBJECTS).map(Number).sort((a, b) => a - b),
-    [],
+    () => Array.from({ length: semesterCount }, (_, i) => i + 1),
+    [semesterCount],
   );
 
   const rawQuery = search.trim().toLowerCase();
@@ -75,7 +78,7 @@ function Index() {
   const filtered = useMemo(() => {
     if (!query) return allSemesters;
     return allSemesters.filter((sem) =>
-      SEMESTER_SUBJECTS[sem].some((s) => s.toLowerCase().includes(query)),
+      (SEMESTER_SUBJECTS[sem] ?? []).some((s) => s.toLowerCase().includes(query)),
     );
   }, [query, allSemesters]);
 
@@ -84,7 +87,7 @@ function Index() {
     if (!query) return [] as { sem: number; subject: string }[];
     const out: { sem: number; subject: string }[] = [];
     for (const sem of allSemesters) {
-      for (const subject of SEMESTER_SUBJECTS[sem]) {
+      for (const subject of SEMESTER_SUBJECTS[sem] ?? []) {
         if (subject.toLowerCase().includes(query)) out.push({ sem, subject });
       }
     }
@@ -175,7 +178,7 @@ function Index() {
   }
 
   const unlockedCount = allSemesters.filter((s) => !(locked[s] ?? true)).length;
-  const totalSubjects = allSemesters.reduce((n, s) => n + SEMESTER_SUBJECTS[s].length, 0);
+  const totalSubjects = allSemesters.reduce((n, s) => n + (SEMESTER_SUBJECTS[s]?.length ?? 0), 0);
 
   if (loading) {
     return (
@@ -209,6 +212,18 @@ function Index() {
     .slice(0, 2)
     .toUpperCase();
 
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const metaName =
+    (typeof meta.full_name === "string" && meta.full_name) ||
+    (typeof meta.name === "string" && meta.name) ||
+    "";
+  const firstName =
+    profile?.name?.split(" ")[0] ||
+    metaName.split(" ")[0] ||
+    profile?.email?.split("@")[0] ||
+    user.email?.split("@")[0] ||
+    "Student";
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
@@ -231,7 +246,7 @@ function Index() {
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
-                  Welcome, {profile?.name?.split(" ")[0] ?? "Student"} 👋
+                  Welcome, {firstName} 👋
                 </h1>
                 {hasActiveAccess && (
                   <Badge className="bg-white/20 text-primary-foreground border-0 hover:bg-white/30">
@@ -248,6 +263,17 @@ function Index() {
               </p>
               <p className="opacity-75 text-xs mt-0.5 truncate">{profile?.email ?? user.email}</p>
             </div>
+          </div>
+
+          {/* FWU hero image */}
+          <div className="relative mt-5 rounded-xl overflow-hidden border border-white/20">
+            <img
+              src={fwuHero}
+              alt="Far Western University"
+              width={1280}
+              height={640}
+              className="w-full h-32 sm:h-40 object-cover"
+            />
           </div>
 
           {/* Quick stats */}
@@ -551,7 +577,7 @@ function Index() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 stagger-children">
           {filtered.map((sem) => {
             const isLocked = locked[sem] ?? true;
-            const subjects = SEMESTER_SUBJECTS[sem];
+            const subjects = SEMESTER_SUBJECTS[sem] ?? [];
             const card = (
               <Card
                 className={`group relative overflow-hidden p-5 h-full ${

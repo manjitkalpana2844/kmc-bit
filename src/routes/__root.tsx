@@ -5,6 +5,8 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { MotionProvider } from "@/hooks/use-motion";
 import { Toaster } from "@/components/ui/sonner";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { BackButton } from "@/components/BackButton";
 
 function NotFoundComponent() {
   return (
@@ -72,7 +74,11 @@ function RootComponent() {
     <ThemeProvider>
       <MotionProvider>
         <AuthProvider>
-          <Outlet />
+          <div className="pb-16 sm:pb-0">
+            <Outlet />
+          </div>
+          <BackButton />
+          <MobileBottomNav />
           <Toaster richColors position="top-center" />
         </AuthProvider>
       </MotionProvider>
