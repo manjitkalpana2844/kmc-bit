@@ -313,6 +313,7 @@ export function AdminUsers() {
 }
 
 function AccessDialog({ user, access, onChange }: { user: UserRow; access: AccessRow[]; onChange: () => void }) {
+  const semesterCount = useSemesterCount();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<"semester_pass" | "monthly_all_access">("semester_pass");
   const [semester, setSemester] = useState<string>("1");
@@ -374,8 +375,8 @@ function AccessDialog({ user, access, onChange }: { user: UserRow; access: Acces
             <Select value={semester} onValueChange={setSemester}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {Object.keys(SEMESTER_SUBJECTS).map((s) => (
-                  <SelectItem key={s} value={s}>{SEMESTER_ORDINAL(Number(s))} Semester</SelectItem>
+                {Array.from({ length: semesterCount }, (_, i) => i + 1).map((s) => (
+                  <SelectItem key={s} value={String(s)}>{SEMESTER_ORDINAL(s)} Semester</SelectItem>
                 ))}
               </SelectContent>
             </Select>
