@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
+import { SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { useSemesterCount } from "@/hooks/use-semester-count";
 import { Input } from "@/components/ui/input";
 import { downloadCsv } from "@/lib/csv";
