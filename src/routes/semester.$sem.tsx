@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ArrowLeft, BookMarked, Lock } from "lucide-react";
+import { ArrowLeft, BookMarked, GraduationCap, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
@@ -74,11 +74,16 @@ function SemesterPage() {
           <ArrowLeft className="h-4 w-4" /> Back
         </Link>
         <div className="flex items-center gap-3 mb-6">
-          <div
-            className="h-12 w-12 rounded-xl flex items-center justify-center text-primary-foreground font-bold"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            {semNum}
+          <div className="relative h-12 w-12 shrink-0">
+            <div
+              className="h-12 w-12 rounded-2xl flex items-center justify-center text-primary-foreground shadow-lg"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <GraduationCap className="h-6 w-6" />
+            </div>
+            <span className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-background border-2 border-primary text-primary text-[11px] font-bold flex items-center justify-center">
+              {semNum}
+            </span>
           </div>
           <div>
             <h1 className="text-2xl font-bold">{SEMESTER_ORDINAL(semNum)} Semester</h1>
