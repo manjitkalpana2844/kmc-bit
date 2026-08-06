@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { downloadCsv } from "@/lib/csv";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { confirmUserEmails, listUnconfirmedUsers, resendVerificationEmail } from "@/server/admin-confirm-email.functions";
+import { confirmUserEmails, listUnconfirmedUsers, resendVerificationEmail } from "@/lib/admin-confirm-email.functions";
 
 interface UserRow {
   id: string; name: string | null; email: string | null; avatar_url: string | null;
