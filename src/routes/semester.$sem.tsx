@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SEMESTER_SUBJECTS, SEMESTER_ORDINAL } from "@/lib/curriculum";
+import { SEMESTER_COURSES, SEMESTER_CREDITS, SEMESTER_ORDINAL } from "@/lib/curriculum";
 import { useState } from "react";
 
 export const Route = createFileRoute("/semester/$sem")({
@@ -41,7 +41,8 @@ function SemesterPage() {
     return () => { supabase.removeChannel(ch); };
   }, [semNum]);
 
-  const subjects = SEMESTER_SUBJECTS[semNum] ?? [];
+  const courses = SEMESTER_COURSES[semNum] ?? [];
+  const credits = SEMESTER_CREDITS[semNum];
 
   if (!user || locked === null) {
     return (
@@ -81,12 +82,14 @@ function SemesterPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">{SEMESTER_ORDINAL(semNum)} Semester</h1>
-            <p className="text-xs text-muted-foreground">Select a subject to view papers</p>
+            <p className="text-xs text-muted-foreground">
+              FWU BIT curriculum{credits ? ` · ${credits} credit hours` : ""} · {courses.length} subjects
+            </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {subjects.map((subject) => (
+          {courses.map(({ code, name: subject }) => (
             <Link
               key={subject}
               to="/subject/$sem/$subject"
@@ -96,7 +99,12 @@ function SemesterPage() {
                 className="p-5 hover:-translate-y-1 hover:shadow-lg transition-all cursor-pointer h-full"
                 style={{ boxShadow: "var(--shadow-card)" }}
               >
-                <BookMarked className="h-7 w-7 text-primary mb-3" />
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <BookMarked className="h-7 w-7 text-primary" />
+                  <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                    {code}
+                  </span>
+                </div>
                 <div className="font-semibold">{subject}</div>
                 <div className="text-xs text-muted-foreground mt-1">View papers & notes</div>
               </Card>
