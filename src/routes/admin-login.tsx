@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Shield, Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import fwuLogo from "@/assets/fwu-logo.png.asset.json";
 
 export const Route = createFileRoute("/admin-login")({
   component: AdminLoginPage,
@@ -43,8 +44,6 @@ function AdminLoginPage() {
   };
 
   return (
-import fwuLogo from "@/assets/fwu-logo.png.asset.json";
-
     <div className="min-h-screen flex items-center justify-center px-4 bg-background">
       <div className="w-full max-w-md">
         <Card className="p-6" style={{ boxShadow: "var(--shadow-elegant)" }}>
