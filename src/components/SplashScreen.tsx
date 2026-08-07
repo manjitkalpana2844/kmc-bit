@@ -1,4 +1,4 @@
-import { GraduationCap } from "lucide-react";
+import fwuLogo from "@/assets/fwu-logo.png.asset.json";
 import fwuHero from "@/assets/fwu-hero.jpg";
 
 export function SplashScreen() {
@@ -15,21 +15,26 @@ export function SplashScreen() {
         className="absolute inset-0 w-full h-full object-cover opacity-20"
       />
       <div className="relative flex flex-col items-center">
-      <div
-        className="h-20 w-20 rounded-3xl flex items-center justify-center animate-in fade-in zoom-in duration-500"
-        style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}
-      >
-        <GraduationCap className="h-10 w-10 text-primary-foreground" />
-      </div>
-      <div className="mt-6 text-center animate-in fade-in slide-in-from-bottom-2 duration-700">
-        <h1 className="text-lg font-bold">FWU BIT</h1>
-        <p className="text-xs text-muted-foreground mt-1">Far Western University</p>
-      </div>
-      <div className="mt-8 flex gap-1.5">
-        <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
-        <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
-        <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
-      </div>
+        <div
+          className="h-24 w-24 rounded-3xl flex items-center justify-center bg-white animate-in fade-in zoom-in duration-500"
+          style={{ boxShadow: "var(--shadow-elegant)" }}
+        >
+          <img
+            src={fwuLogo.url}
+            alt="FWU BIT"
+            className="h-full w-full object-contain p-2"
+            draggable={false}
+          />
+        </div>
+        <div className="mt-6 text-center animate-in fade-in slide-in-from-bottom-2 duration-700">
+          <h1 className="text-lg font-bold">FWU BIT</h1>
+          <p className="text-xs text-muted-foreground mt-1">Far Western University</p>
+        </div>
+        <div className="mt-8 flex gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+        </div>
       </div>
     </div>
   );

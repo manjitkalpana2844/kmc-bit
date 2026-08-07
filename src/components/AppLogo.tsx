@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { GraduationCap } from "lucide-react";
+import fwuLogo from "@/assets/fwu-logo.png.asset.json";
 
 interface Props {
   onLongPress?: () => void;
@@ -46,11 +46,16 @@ export function AppLogo({ onLongPress, size = "md" }: Props) {
       onTouchEnd={clear}
       onTouchCancel={clear}
       onContextMenu={(e) => e.preventDefault()}
-      className={`${sizes[size]} rounded-2xl flex items-center justify-center select-none cursor-pointer transition-all ${holding ? "scale-110 ring-4 ring-primary/40" : "active:scale-95"}`}
-      style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)", touchAction: "none" }}
+      className={`${sizes[size]} rounded-2xl flex items-center justify-center select-none cursor-pointer transition-all overflow-hidden bg-white ${holding ? "scale-110 ring-4 ring-primary/40" : "active:scale-95"}`}
+      style={{ boxShadow: "var(--shadow-elegant)", touchAction: "none" }}
       aria-label="FWU BIT logo"
     >
-      <GraduationCap className="text-primary-foreground" />
+      <img
+        src={fwuLogo.url}
+        alt="FWU BIT"
+        className="h-full w-full object-contain p-1"
+        draggable={false}
+      />
     </button>
   );
 }
