@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Shield, Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import fwuLogo from "@/assets/fwu-logo.png.asset.json";
 
 export const Route = createFileRoute("/admin-login")({
   component: AdminLoginPage,
@@ -47,11 +48,8 @@ function AdminLoginPage() {
       <div className="w-full max-w-md">
         <Card className="p-6" style={{ boxShadow: "var(--shadow-elegant)" }}>
           <div className="flex flex-col items-center mb-4">
-            <div
-              className="h-14 w-14 rounded-2xl flex items-center justify-center mb-3"
-              style={{ background: "var(--gradient-primary)" }}
-            >
-              <Shield className="h-7 w-7 text-primary-foreground" />
+            <div className="h-16 w-16 rounded-2xl flex items-center justify-center bg-white mb-3 overflow-hidden" style={{ boxShadow: "var(--shadow-elegant)" }}>
+              <img src={fwuLogo.url} alt="FWU BIT" className="h-full w-full object-contain p-1.5" draggable={false} />
             </div>
             <h1 className="text-xl font-bold">Admin Login</h1>
             <p className="text-xs text-muted-foreground mt-1">Restricted access · FWU BIT</p>
