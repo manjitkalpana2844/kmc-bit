@@ -29,7 +29,6 @@ export function AdminUpload() {
     const list = Array.from(e.target.files ?? []);
     const valid: File[] = [];
     for (const f of list) {
-      if (f.type !== "application/pdf") { toast.error(`${f.name}: only PDFs allowed`); continue; }
       if (f.size > MAX) { toast.error(`${f.name}: exceeds 50MB`); continue; }
       valid.push(f);
     }
@@ -48,10 +47,10 @@ export function AdminUpload() {
       const f = files[i];
       const safe = f.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const path = `${semester}/${encodeURIComponent(subject)}/${Date.now()}-${i}-${safe}`;
-      const { error: upErr } = await supabase.storage.from("pdfs").upload(path, f, { contentType: "application/pdf" });
+      const { error: upErr } = await supabase.storage.from("pdfs").upload(path, f, { contentType: f.type || "application/octet-stream" });
       if (upErr) { toast.error(`${f.name}: ${upErr.message}`); setProgress({ done: i + 1, total: files.length }); continue; }
       const baseTitle = title.trim();
-      const fallback = f.name.replace(/\.pdf$/i, "");
+      const fallback = f.name.replace(/\.[^./\\]+$/, "");
       const finalTitle = files.length === 1 ? (baseTitle || fallback) : (baseTitle ? `${baseTitle} ${i + 1}` : fallback);
       const { error: insErr } = await supabase.from("pdf_files").insert({
         semester: Number(semester), subject,
@@ -63,7 +62,7 @@ export function AdminUpload() {
     }
     setBusy(false);
     setProgress(null);
-    if (okCount > 0) toast.success(`${okCount}/${files.length} PDF${okCount === 1 ? "" : "s"} uploaded`);
+    if (okCount > 0) toast.success(`${okCount}/${files.length} file${okCount === 1 ? "" : "s"} uploaded`);
     setTitle(""); setFiles([]);
     const input = document.getElementById("pdf-file-input") as HTMLInputElement | null;
     if (input) input.value = "";
@@ -72,7 +71,7 @@ export function AdminUpload() {
   return (
     <Card className="p-6 max-w-2xl">
       <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
-        <Upload className="h-5 w-5" /> Upload PDF
+        <Upload className="h-5 w-5" /> Upload files
       </h2>
       <form onSubmit={submit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -120,8 +119,8 @@ export function AdminUpload() {
           <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Java Final 2081 (auto-numbered for multiple files)" />
         </div>
         <div>
-          <Label htmlFor="pdf-file-input">PDF files (max 50MB each, select multiple)</Label>
-          <Input id="pdf-file-input" type="file" accept="application/pdf" multiple onChange={onPick} />
+          <Label htmlFor="pdf-file-input">Files — any type (max 50MB each, select multiple)</Label>
+          <Input id="pdf-file-input" type="file" multiple onChange={onPick} />
           {files.length > 0 && (
             <div className="mt-2 space-y-1">
               {files.map((f, i) => (
