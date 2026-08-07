@@ -92,8 +92,8 @@ function BookEditor({ book, onSaved }: { book?: Book; onSaved: () => void }) {
     e.preventDefault();
     if (!user) return;
     if (!title.trim()) return toast.error("Title required");
-    if (!book && !pdfFile) return toast.error("Select a PDF file");
-    if (pdfFile && pdfFile.size > MAX_PDF) return toast.error("PDF must be ≤ 50MB");
+    if (!book && !pdfFile) return toast.error("Select a file");
+    if (pdfFile && pdfFile.size > MAX_PDF) return toast.error("File must be ≤ 50MB");
     if (coverFile && coverFile.size > MAX_COVER) return toast.error("Cover must be ≤ 2MB");
     setBusy(true);
     try {
@@ -101,7 +101,7 @@ function BookEditor({ book, onSaved }: { book?: Book; onSaved: () => void }) {
       if (pdfFile) {
         const safe = pdfFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const path = `pdfs/${Date.now()}-${safe}`;
-        const up = await supabase.storage.from("books").upload(path, pdfFile, { contentType: "application/pdf", upsert: false });
+        const up = await supabase.storage.from("books").upload(path, pdfFile, { contentType: pdfFile.type || "application/octet-stream", upsert: false });
         if (up.error) throw up.error;
         file_path = path;
       }
@@ -186,8 +186,8 @@ function BookEditor({ book, onSaved }: { book?: Book; onSaved: () => void }) {
             <Input type="file" accept="image/*" onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)} />
           </div>
           <div>
-            <Label>PDF file {book ? "(leave empty to keep current)" : "(≤ 50MB)"}</Label>
-            <Input type="file" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)} />
+            <Label>Book file — any type {book ? "(leave empty to keep current)" : "(≤ 50MB)"}</Label>
+            <Input type="file" onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)} />
           </div>
           <Button type="submit" disabled={busy} className="w-full">
             {busy ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-1" />}
