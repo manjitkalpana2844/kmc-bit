@@ -429,8 +429,8 @@ function Index() {
                         } ${isLocked ? "opacity-60" : ""}`}
                       >
                         <div
-                          className="h-7 w-7 rounded-md flex items-center justify-center text-[11px] font-bold text-primary-foreground shrink-0"
-                          style={{ background: isLocked ? "var(--muted)" : "var(--gradient-primary)" }}
+                     className={`h-7 w-7 rounded-md flex items-center justify-center text-[11px] font-bold shrink-0 ${isLocked ? "bg-muted text-muted-foreground border" : "text-primary-foreground"}`}
+                          style={isLocked ? undefined : { background: "var(--gradient-primary)" }}
                         >
                           {sem}
                         </div>
@@ -477,8 +477,8 @@ function Index() {
                   const row = (
                     <div className="flex items-center gap-3 px-2 py-2.5">
                       <div
-                        className="h-8 w-8 rounded-lg flex items-center justify-center text-xs font-bold text-primary-foreground shrink-0"
-                        style={{ background: isLocked ? "var(--muted)" : "var(--gradient-primary)" }}
+                        className={`h-8 w-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${isLocked ? "bg-muted text-muted-foreground border" : "text-primary-foreground"}`}
+                        style={isLocked ? undefined : { background: "var(--gradient-primary)" }}
                       >
                         {sem}
                       </div>
@@ -596,8 +596,8 @@ function Index() {
                 )}
                 <div className="flex items-start justify-between mb-3">
                   <div
-                    className="h-10 w-10 rounded-xl flex items-center justify-center text-primary-foreground font-bold text-sm relative"
-                    style={{ background: isLocked ? "var(--muted)" : "var(--gradient-primary)" }}
+                    className={`h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm relative ${isLocked ? "bg-muted text-muted-foreground border" : "text-primary-foreground"}`}
+                    style={isLocked ? undefined : { background: "var(--gradient-primary)" }}
                   >
                     <BookMarked className="h-5 w-5" />
                     <span className="absolute -bottom-1 -right-1 text-[10px] bg-background text-foreground rounded-full h-4 w-4 flex items-center justify-center border">
